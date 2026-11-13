@@ -23,3 +23,12 @@ class Random:
 
     def jouer(self, mes_coups, ses_coups, rng):
         return C if rng.random() < 0.5 else D
+
+
+class TitForTat:
+    nom = 'TIT-FOR-TAT'
+
+    def jouer(self, mes_coups, ses_coups, rng):
+        if not ses_coups:
+            return C
+        return ses_coups[-1]
