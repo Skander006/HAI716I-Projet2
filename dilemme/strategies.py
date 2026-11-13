@@ -59,3 +59,12 @@ class Joss:
         if coup == C and rng.random() < 0.1:
             return D
         return coup
+
+
+class Grudger:
+    nom = 'GRUDGER'
+
+    def jouer(self, mes_coups, ses_coups, rng):
+        if D in ses_coups:
+            return D
+        return C
