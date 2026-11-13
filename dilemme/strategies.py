@@ -49,3 +49,13 @@ class Tester:
         if self.riposte:
             return ses_coups[-1]
         return D if (tour - 1) % 3 == 0 else C
+
+
+class Joss:
+    nom = 'JOSS'
+
+    def jouer(self, mes_coups, ses_coups, rng):
+        coup = ses_coups[-1] if ses_coups else C
+        if coup == C and rng.random() < 0.1:
+            return D
+        return coup
