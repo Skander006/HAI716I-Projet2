@@ -16,3 +16,10 @@ class AllD:
 
     def jouer(self, mes_coups, ses_coups, rng):
         return D
+
+
+class Random:
+    nom = 'RANDOM'
+
+    def jouer(self, mes_coups, ses_coups, rng):
+        return C if rng.random() < 0.5 else D
