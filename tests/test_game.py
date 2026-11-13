@@ -1,14 +1,18 @@
 from engine.game import get_payoffs, play_game
+from engine.tournament import run_tournament
 
 class AlwaysCooperate:
+    nom = "ALL-C"
     def jouer(self, mes_coups, ses_coups, rng):
         return "C"
 
 class AlwaysDefect:
+    nom = "ALL-D"
     def jouer(self, mes_coups, ses_coups, rng):
         return "D"
 
 class TitForTat:
+    nom = "TIT FOR TAT"
     def jouer(self, mes_coups, ses_coups, rng):
         return "C" if not ses_coups else ses_coups[-1]
 
@@ -32,3 +36,7 @@ if __name__ == "__main__":
     test_payoffs()
     test_games()
     print("Tous les tests sont réussis !")
+
+    ranking = run_tournament([AlwaysCooperate, AlwaysDefect, TitForTat])
+    for name, score in ranking:
+        print(f"{name}: {score} points")
