@@ -32,3 +32,20 @@ class TitForTat:
         if not ses_coups:
             return C
         return ses_coups[-1]
+
+
+class Tester:
+    nom = 'TESTER'
+
+    def __init__(self):
+        self.riposte = False
+
+    def jouer(self, mes_coups, ses_coups, rng):
+        tour = len(mes_coups) + 1
+        if tour == 1:
+            return D
+        if mes_coups[-2:-1] == [D] and ses_coups[-1] == D:
+            self.riposte = True
+        if self.riposte:
+            return ses_coups[-1]
+        return D if (tour - 1) % 3 == 0 else C
