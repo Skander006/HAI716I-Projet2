@@ -1,7 +1,6 @@
 
 from engine.game import play_game
 
-
 def run_tournament(strategies, games_per_pair=5, rounds=200, seed=42):
     # Initialiser les scores
     scores = {strategy.nom: 0 for strategy in strategies}

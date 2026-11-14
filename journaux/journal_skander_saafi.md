@@ -17,23 +17,22 @@ Les deux parties seront ensuite intégrées pour réaliser les expériences.
 
 ### 2.1. Implémentation
 
-J'ai développé le moteur permettant de simuler une partie du dilemme du prisonnier itéré, avec la matrice de gains imposée et 200 tours par défaut.
+J'ai développé le moteur du dilemme du prisonnier itéré en respectant la matrice des gains imposée et les 200 tours par partie.
+Mes principaux choix techniques :
 
-J'ai fait plusieurs choix techniques :
-- Deux historiques distincts, mis à jour après les deux décisions pour garantir leur simultanéité.
-- Des graines pseudo-aléatoires fixes pour rendre les résultats reproductibles.
-- Une interface commune `jouer(mes_coups, ses_coups, rng)` pour intégrer facilement les stratégies.
+- Deux historiques indépendants, mis à jour après les deux décisions pour garantir leur simultanéité.
+- Des graines pseudo-aléatoires fixes pour assurer la reproductibilité.
+- Une interface commune `jouer(mes_coups, ses_coups, rng)` pour intégrer les stratégies.
 
-J'ai ensuite implémenté le tournoi tous contre tous : chaque paire de stratégies joue 5 parties de 200 tours. Les scores sont cumulés pour établir le classement final.
-
+J'ai ensuite implémenté le tournoi tous contre tous : chaque paire joue 5 parties de 200 tours. Les scores sont cumulés pour établir le classement.
 Dans cette première version, les paires inversées et les auto-rencontres sont exclues.
 
 ### 2.2. Tests et difficultés
 
-J'ai validé le moteur avec trois stratégies simples : ALL-C, ALL-D et TIT-FOR-TAT. Les tests de la matrice des gains et des scores ont réussi, et le tournoi s'exécute correctement.
+J'ai testé le moteur avec trois stratégies simples : ALL-C, ALL-D et TIT-FOR-TAT.
+Les tests automatiques ont permis de vérifier la matrice des gains, les scores cumulés, le classement et la reproductibilité. Tous les tests ont réussi.
 
-*Capture d'écran des tests réussis : ![alt text](image.png)*
-
+J'ai également résolu des problèmes d'importation entre modules Python et ajouté l'attribut `nom` aux stratégies de test pour permettre leur classement.
 ### 2.3. Résultats et analyse des cinq stratégies
 
 
