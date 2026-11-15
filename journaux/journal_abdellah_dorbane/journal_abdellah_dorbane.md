@@ -148,9 +148,15 @@ Je m'attends à ce qu'elle joue très bien contre les stratégies gentilles, ave
 
 ### 5.2. La stratégie de Skander : TIT-FOR-TWO-TATS
 
-De son côté, Skander a choisi TIT-FOR-TWO-TATS : elle coopère et ne trahit que si l'adversaire a joué D **deux fois de suite**. C'est un TIT-FOR-TAT plus patient, qui laisse passer une trahison isolée. Il explique son choix dans son journal.
+De son côté, Skander a choisi **TIT-FOR-TWO-TATS**, « donnant-donnant à deux coups ».
+
+Sa règle : je coopère, et je ne trahis que si l'adversaire a joué D **deux fois de suite**. Une trahison isolée est donc laissée passer. C'est une version plus patiente de TIT-FOR-TAT. Elle vient elle aussi des tournois d'Axelrod : après le premier tournoi, Axelrod avait remarqué qu'elle aurait pu le gagner si quelqu'un l'avait proposée, et John Maynard Smith l'a soumise au second tournoi.
 
 En mettant nos deux stratégies côte à côte, je me suis rendu compte qu'elles étaient presque opposées : la mienne ne pardonne jamais, la sienne pardonne facilement. Ça tombait bien pour voir lequel des deux comportements s'en sort le mieux.
+
+Sur le papier, je m'attends à ce qu'elle joue bien contre les stratégies gentilles, comme TIT-FOR-TAT, et surtout mieux que TIT-FOR-TAT contre JOSS : quand JOSS trahit par surprise, TIT-FOR-TWO-TATS ne riposte pas, donc il n'y a pas d'écho de représailles et la coopération reprend tout de suite. Par contre, contre ALL-D, elle perd les deux premiers tours au lieu d'un seul, et une stratégie qui trahit souvent mais jamais deux fois de suite pourrait l'exploiter sans jamais être punie.
+
+**Mon avis :** sa patience est un avantage quand les trahisons sont rares et accidentelles, mais c'est aussi une porte ouverte pour les stratégies qui calculent leurs trahisons.
 
 ### 5.3. Le tournoi à sept stratégies (15/11)
 
@@ -181,6 +187,8 @@ En fait, GRUDGER fait un peu les deux à la fois : avec les stratégies gentille
 **Les nouvelles stratégies ne donnent rien à ALL-D.** ALL-D exploite toujours RANDOM (3494 points), mais les deux nouvelles stratégies commencent par coopérer et se défendent : ALL-D ne fait qu'environ 2000 points contre chacune. Par contre, entre elles, les stratégies gentilles se font 3000 points. C'est justement ce qui manquait à TIT-FOR-TAT à l'étape 1 : maintenant elle a des partenaires, et elle repasse devant ALL-D. Ça rejoint ce que je pensais en partie 4 : TIT-FOR-TAT a besoin d'autres stratégies qui coopèrent pour bien marcher.
 
 **TESTER profite de TIT-FOR-TWO-TATS.** En regardant les duels, j'ai vu que TESTER fait 3670 points contre elle, son meilleur score. En déroulant la partie, j'ai compris pourquoi : le cycle de TESTER, C, C, D, ne contient jamais deux D de suite. Du coup, TIT-FOR-TWO-TATS ne riposte jamais et se fait avoir pendant toute la partie. Être patient, ça coûte cher contre quelqu'un qui trahit souvent mais jamais deux fois d'affilée.
+
+**Mais la patience paie contre JOSS.** Comme je l'attendais en 5.2, TIT-FOR-TWO-TATS fait 2629 points contre JOSS, alors que TIT-FOR-TAT n'en fait que 2046 : quand JOSS trahit par surprise, elle ne riposte pas, et la coopération reprend sans écho de représailles. Sa patience l'aide contre les trahisons rares, et la dessert contre les trahisons régulières.
 
 **Le pardon ne gagne pas ici.** J'avais choisi GRUDGER pour tester la règle « pardonner » d'Axelrod, et dans notre tournoi, c'est la stratégie rancunière qui gagne, alors que la plus patiente finit quatrième. Mon explication : comme il n'y a aucune erreur, les stratégies gentilles ne trahissent jamais, donc GRUDGER n'a jamais besoin de pardonner. Je pense que ça changera si un coup peut être inversé par erreur : une seule erreur et GRUDGER trahit jusqu'à la fin.
 
