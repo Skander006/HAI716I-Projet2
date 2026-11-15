@@ -763,6 +763,247 @@ Ces vérifications renforcent la confiance dans l'implémentation, même si elle
 
 #### 2.3.4. Résultats et analyse
 
+##### 1) Résultats et analyse de la modification du bruit
+
+**a) Résultats du tournoi avec un bruit de 5 %**
+
+Après avoir vérifié le fonctionnement du bruit, nous avons exécuté le tournoi avec les sept stratégies, en conservant cinq parties de 200 tours par paire, la graine initiale 42 et l'absence d'auto-rencontres.
+
+La seule modification par rapport au tournoi de référence est l'introduction d'une probabilité de 5 % d'inversion de chaque action exécutée.
+
+Les résultats obtenus sont les suivants :
+
+| Stratégie | Rang sans bruit | Rang avec bruit | Score sans bruit | Score avec bruit |
+|---|---:|---:|---:|---:|
+| JOSS | 5 | 1 | 13 957 | 14 415 |
+| ALL-D | 6 | 2 | 13 581 | 14 412 |
+| GRUDGER | 1 | 3 | 15 493 | 14 361 |
+| TESTER | 3 | 4 | 14 697 | 14 286 |
+| TIT-FOR-TAT | 2 | 5 | 15 009 | 14 249 |
+| TIT-FOR-TWO-TATS | 4 | 6 | 14 630 | 13 822 |
+| RANDOM | 7 | 7 | 12 585 | 12 776 |
+
+**Capture d'écran du classement avec et sans bruit :**
+
+![Comparaison des classements avec et sans bruit](comparaison_bruit_5_pourcent.png)
+
+Cette capture d'écran est prise du résultat du main.py
+
+Le résultat le plus surprenant est la victoire de JOSS, qui termine première avec 14 415 points, devant ALL-D avec 14 412 points.
+
+L'écart entre les deux stratégies n'est que de trois points. Ce résultat doit donc être interprété avec prudence.
+
+GRUDGER, qui avait remporté le tournoi sans bruit, descend à la troisième place.
+
+TIT-FOR-TAT passe de la deuxième à la cinquième place, tandis que TIT-FOR-TWO-TATS recule de la quatrième à la sixième.
+
+Ces changements montrent qu'une probabilité d'erreur relativement faible peut modifier fortement les interactions entre les stratégies.
+
+**b) Analyse des confrontations individuelles avec bruit**
+
+Pour comprendre ces résultats, nous avons utilisé `run_duels()` avec `noise=0.05`.
+
+**Capture d'écran des duels avec bruit :**
+
+![Duels avec un bruit de 5%](duels_bruit_5_pourcent.png)
+
+Les scores individuels permettent d'expliquer plusieurs changements de classement.
+
+**Pourquoi GRUDGER perd-elle sa première place ?**
+
+Sans bruit, GRUDGER obtenait 3 000 points contre TIT-FOR-TAT et 3 000 points contre TIT-FOR-TWO-TATS.
+
+Avec bruit, ses résultats deviennent :
+
+| Adversaire | Sans bruit | Avec bruit | Variation |
+|---|---:|---:|---:|
+| TIT-FOR-TAT | 3 000 | 2 252 | -748 |
+| TIT-FOR-TWO-TATS | 3 000 | 2 401 | -599 |
+
+Ces diminutions s'expliquent par la sensibilité de GRUDGER aux défections.
+
+Dans le tournoi sans bruit, ces confrontations pouvaient maintenir une coopération permanente.
+
+Avec bruit, une coopération peut être accidentellement transformée en défection. Dès qu'une telle défection est observée, GRUDGER décide de ne plus coopérer.
+
+Une erreur ponctuelle peut donc provoquer une rupture durable de la coopération.
+
+Cela explique pourquoi GRUDGER perd une partie de son avantage initial.
+
+**Pourquoi JOSS termine-t-elle première ?**
+
+JOSS obtient notamment :
+
+- 3122 points contre TIT-FOR-TWO-TATS ;
+- 2632 points contre RANDOM ;
+- 2348 points contre TIT-FOR-TAT ;
+- 2335 points contre TESTER.
+
+Ces confrontations contribuent à son score total de 14 415 points.
+
+JOSS introduit déjà des défections occasionnelles dans son comportement, puisqu'elle suit TIT-FOR-TAT tout en pouvant faire défection spontanément.
+
+Ses résultats montrent que cette stratégie reste compétitive lorsque des erreurs d'exécution sont ajoutées.
+
+Cependant, sa première place avec la graine 42 ne suffit pas, à elle seule, à démontrer une supériorité générale.
+
+**Pourquoi ALL-D progresse-t-elle ?**
+
+ALL-D passe de la sixième à la deuxième place, avec une augmentation de 831 points.
+
+Cette stratégie ne cherche jamais volontairement à maintenir une coopération.
+
+Le bruit perturbe donc moins une relation coopérative qu'ALL-D n'essaie pas d'établir.
+
+De plus, les erreurs peuvent provoquer des défections accidentelles chez les stratégies coopératives et déclencher des représailles qui réduisent leurs gains.
+
+ALL-D profite ainsi d'un contexte dans lequel la coopération devient plus difficile à maintenir.
+
+Il faut néanmoins rappeler que le bruit peut également inverser ses propres défections en coopérations : ALL-D n'est donc pas totalement insensible aux erreurs d'exécution.
+
+**Pourquoi TIT-FOR-TWO-TATS recule-t-elle ?**
+
+Mon hypothèse initiale était que TIT-FOR-TWO-TATS résisterait mieux au bruit grâce à sa tolérance aux défections isolées.
+
+Pourtant, elle passe de la quatrième à la sixième place.
+
+Face à GRUDGER, elle obtient seulement 1941 points avec bruit, contre 3000 sans bruit.
+
+La tolérance de TIT-FOR-TWO-TATS ne suffit donc pas à préserver une coopération durable lorsque son adversaire applique une punition permanente.
+
+Elle reste également vulnérable aux stratégies capables d'exploiter sa coopération.
+
+Cette observation contredit mon hypothèse d'une progression de TIT-FOR-TWO-TATS au classement général.
+
+**c) Expérience complémentaire : influence de la graine aléatoire**
+
+Pour vérifier si la victoire de JOSS dépendait uniquement de la graine 42, nous avons répété le tournoi bruité avec dix graines différentes, de 0 à 9.
+
+Les résultats montrent que :
+
+- JOSS termine première avec neuf graines sur dix.
+- GRUDGER termine première avec la graine 9.
+- ALL-D reste troisième dans ces dix expériences.
+- RANDOM termine systématiquement dernière.
+
+Cette expérience apporte une information importante : la victoire de JOSS n'est pas limitée à la seule graine 42.
+
+Cependant, les classements varient légèrement selon les tirages aléatoires, et ces dix graines ne permettent pas de garantir que JOSS serait toujours première.
+
+Nous pouvons donc conclure que JOSS présente de bonnes performances dans les conditions testées, tout en conservant une certaine prudence quant à la généralisation du résultat.
+
+##### 2) Résultats et analyse de la modification de l'horizon inconnu
+
+**a) Résultats du tournoi avec horizon inconnu**
+
+La deuxième modification, implémentée par mon binôme, consiste à remplacer la durée fixe de 200 tours par une probabilité de continuation après chaque tour.
+
+Nous avons utilisé `w = 0.995`, ce qui correspond à une probabilité d'arrêt de 0,005 après chaque tour.
+
+La durée moyenne théorique d'une partie est alors de 200 tours.
+
+Le classement obtenu avec la graine 42 est :
+
+| Rang | Stratégie | Score |
+|---|---|---:|
+| 1 | GRUDGER | 27 278 |
+| 2 | TIT-FOR-TAT | 26 442 |
+| 3 | TESTER | 25 894 |
+| 4 | TIT-FOR-TWO-TATS | 25 813 |
+| 5 | JOSS | 24 423 |
+| 6 | ALL-D | 23 904 |
+| 7 | RANDOM | 22 183 |
+
+**Capture d'écran du tournoi avec horizon inconnu :**
+
+![Classement avec horizon inconnu](classement_horizon_inconnu.png)
+
+Le classement est identique à celui du tournoi de référence à sept stratégies.
+
+GRUDGER conserve sa première place, suivie de TIT-FOR-TAT et TESTER.
+
+Notre hypothèse selon laquelle l'horizon inconnu pourrait améliorer le classement d'ALL-D n'est donc pas confirmée pour `w = 0.995`.
+
+Les scores bruts sont néanmoins plus élevés que dans le tournoi fixe.
+
+Cela peut s'expliquer par les durées effectivement obtenues lors des tirages aléatoires. Même si la durée moyenne théorique est de 200 tours, les parties simulées peuvent être beaucoup plus courtes ou plus longues.
+
+Il serait donc incorrect de comparer directement ces scores bruts à ceux du tournoi fixe sans tenir compte du nombre réel de tours joués.
+
+**b) Expérience complémentaire : influence de la probabilité de continuation**
+
+Pour approfondir l'analyse, nous avons fait varier la probabilité de continuation en exécutant 200 parties par paire de stratégies.
+
+Les résultats sont les suivants :
+
+| Probabilité de continuation | Durée moyenne théorique | Première stratégie | Rang d'ALL-D |
+|---|---:|---|---:|
+| 0,995 | 200 tours | GRUDGER | 6 |
+| 0,9 | 10 tours | GRUDGER | 3 |
+| 0,8 | 5 tours | ALL-D | 1 |
+| 0,5 | 2 tours | ALL-D | 1 |
+
+Cette expérience révèle une tendance importante.
+
+Lorsque la probabilité de continuation est élevée, les parties sont généralement longues. Les stratégies capables de maintenir une coopération stable, comme GRUDGER et TIT-FOR-TAT, conservent de bonnes performances.
+
+Lorsque la probabilité de continuation diminue, les parties deviennent plus courtes.
+
+Dans ces conditions, ALL-D devient plus compétitive, car elle peut exploiter immédiatement les adversaires qui commencent par coopérer.
+
+Les stratégies coopératives disposent alors de moins de tours pour compenser leurs pertes initiales ou établir une coopération durable.
+
+ALL-D atteint ainsi la première place pour `w = 0.8` et `w = 0.5`.
+
+Cette expérience confirme que la durée attendue des interactions influence fortement les stratégies favorisées par le tournoi.
+
+Elle nuance également notre hypothèse initiale : l'horizon inconnu ne favorise pas nécessairement ALL-D lorsque la durée moyenne reste longue, mais les horizons très courts peuvent lui être favorables.
+
+**c) Vérification avec d'autres graines**
+
+Nous avons également répété le tournoi avec `w = 0.995` en utilisant les graines 0, 100 et 1000.
+
+Le classement est resté identique lors des trois expériences :
+
+GRUDGER > TIT-FOR-TAT > TESTER > TIT-FOR-TWO-TATS > JOSS > ALL-D > RANDOM.
+
+Cette stabilité suggère que, pour les conditions testées, le classement est relativement robuste aux graines choisies.
+
+Cependant, trois graines ne suffisent pas à établir une propriété générale. Des répétitions supplémentaires permettraient de mieux quantifier la variabilité des résultats.
+
+##### 3) Comparaison avec les hypothèses initiales
+Les deux modifications permettent maintenant de confronter nos prédictions aux observations.
+
+| Hypothèse | Observation | Conclusion |
+|---|---|---|
+| GRUDGER sera pénalisée par le bruit | Elle passe de la 1re à la 3e place | Confirmée |
+| TIT-FOR-TWO-TATS progressera grâce à sa tolérance | Elle passe de la 4e à la 6e place | Non confirmée |
+| Le bruit perturbera la coopération | Les scores et les classements changent sensiblement | Confirmée dans les expériences |
+| L'horizon inconnu pourrait favoriser ALL-D | ALL-D reste 6e avec `w = 0.995` | Non confirmée pour cette valeur |
+| Les horizons courts favoriseront la défection | ALL-D termine première avec `w = 0.8` et `w = 0.5` | Confirmée dans les expériences complémentaires |
+
+Ces résultats montrent l'importance de distinguer les hypothèses initiales des observations expérimentales.
+
+Certaines prédictions ont été confirmées, tandis que d'autres ont été contredites par les résultats.
+
+Les expériences complémentaires ont également permis d'affiner notre interprétation, notamment concernant la durée attendue des interactions.
+
+**Conclusion de l'étape 3**
+
+Cette troisième étape montre que les performances des stratégies dépendent fortement des conditions d'exécution du tournoi.
+
+L'introduction d'un bruit de 5 % modifie profondément le classement. GRUDGER perd sa première place, tandis que JOSS et ALL-D deviennent particulièrement compétitives.
+
+Cette expérience révèle les limites des stratégies qui réagissent fortement aux défections accidentelles, mais aussi le fait que la tolérance ne garantit pas systématiquement de meilleures performances.
+
+L'horizon inconnu produit des résultats différents. Avec une probabilité de continuation de 0,995, le classement reste identique à celui du tournoi de référence.
+
+En revanche, lorsque les parties deviennent plus courtes, ALL-D progresse jusqu'à prendre la première place.
+
+Ces observations mettent en évidence deux facteurs importants : la fiabilité des actions exécutées et la durée attendue des interactions.
+
+Elles confirment qu'aucune stratégie ne peut être considérée comme universellement supérieure. Son efficacité dépend de la population d'adversaires, du niveau de bruit et des conditions dans lesquelles les interactions se déroulent.
+
 ## Partie 3 — Bilan final
 
 ### 3.1. Synthèse des résultats
