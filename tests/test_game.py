@@ -35,6 +35,23 @@ def test_games():
 def longueur(seed, continuation):
     return play_game(AlwaysCooperate(), AlwaysCooperate(), seed=seed, continuation=continuation)[0] // 3
 
+class AlwaysCooperate:
+    nom = "ALL-C"
+
+    def jouer(self, mes_coups, ses_coups, rng):
+        return "C"
+
+def test_noise_zero():
+    s1, s2 = play_game(AlwaysCooperate(),AlwaysCooperate(),rounds=200,noise=0.0)
+    assert (s1, s2) == (600, 600)
+def test_noise_one():
+    s1, s2 = play_game(AlwaysCooperate(),AlwaysCooperate(),rounds=200,noise=1.0)
+    assert (s1, s2) == (400, 400)
+
+def test_noise_reproducibility():
+    result1 = play_game(AlwaysCooperate(),AlwaysCooperate(),rounds=200,seed=42,noise=0.05)
+    result2 = play_game(AlwaysCooperate(),AlwaysCooperate(),rounds=200,seed=42,noise=0.05)
+    assert result1 == result2
 
 def test_horizon_inconnu():
     assert play_game(AlwaysCooperate(), AlwaysCooperate(), continuation=0) == (3, 3)
@@ -60,6 +77,9 @@ if __name__ == "__main__":
     test_payoffs()
     test_games()
     test_horizon_inconnu()
+    test_noise_one()
+    test_noise_zero()
+    test_noise_reproducibility()
     print("Tous les tests sont réussis !")
 
     ranking = run_tournament([AlwaysCooperate, AlwaysDefect, TitForTat])

@@ -14,16 +14,26 @@ def get_payoffs(action1, action2):
         raise ValueError("L'une des actions est incorrecte !")
 
 
-def play_game(strategy1, strategy2,rounds = 200, seed = 42, continuation = None):
+def play_game(strategy1, strategy2,rounds = 200, seed = 42, continuation = None,  noise=0.0):
+    if not 0 <= noise <= 1:
+        raise ValueError("noise doit être compris entre 0 et 1")
+    if continuation is not None and not 0 <= continuation <= 1:
+        raise ValueError("continuation doit être strictement compris entre 0 et 1")
+
     history1, history2 = [], []
     score1, score2 = 0, 0
     rng1 = random.Random(seed)
     rng2 = random.Random(seed + 1)
     rng_fin = random.Random(seed + 2)
+    rng_noise = random.Random(seed + 3)
     played = 0
     while continuation is not None or played < rounds:
         action1 = strategy1.jouer(history1, history2, rng1)
         action2 = strategy2.jouer(history2, history1, rng2)
+        if rng_noise.random() < noise:
+            action1 = "D" if action1 == "C" else "C"
+        if rng_noise.random() < noise:
+            action2 = "D" if action2 == "C" else "C"
         history1.append(action1)
         history2.append(action2)
         gain1, gain2 = get_payoffs(action1, action2)

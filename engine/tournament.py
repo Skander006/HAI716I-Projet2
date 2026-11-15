@@ -1,7 +1,7 @@
 
 from engine.game import play_game
 
-def run_tournament(strategies, games_per_pair=5, rounds=200, seed=42, self_play = False, continuation = None):
+def run_tournament(strategies, games_per_pair=5, rounds=200, seed=42, self_play = False, continuation = None, noise = 0.0):
     # Initialiser les scores
     scores = {strategy.nom: 0 for strategy in strategies}
     for i in range(len(strategies)):
@@ -11,7 +11,7 @@ def run_tournament(strategies, games_per_pair=5, rounds=200, seed=42, self_play 
             strategy2 = strategies[j]
             # Faire jouer chaque paire 5 fois
             for game in range(games_per_pair):
-                score1, score2 = play_game(strategy1(),strategy2(),rounds=rounds,seed=seed + game, continuation=continuation)
+                score1, score2 = play_game(strategy1(),strategy2(),rounds=rounds,seed=seed + game, continuation=continuation, noise = noise)
                 scores[strategy1.nom] += score1
                 if i!=j :
                     scores[strategy2.nom] += score2
@@ -20,7 +20,7 @@ def run_tournament(strategies, games_per_pair=5, rounds=200, seed=42, self_play 
     return ranking
 
 
-def run_duels(strategies, games_per_pair=5, rounds=200, seed=42, self_play=False, continuation=None):
+def run_duels(strategies, games_per_pair=5, rounds=200, seed=42, self_play=False, continuation=None, noise = 0.0):
     duels = {}
     for i in range(len(strategies)):
         start = i if self_play else i + 1
@@ -29,7 +29,7 @@ def run_duels(strategies, games_per_pair=5, rounds=200, seed=42, self_play=False
             strategy2 = strategies[j]
             total1, total2 = 0, 0
             for game in range(games_per_pair):
-                score1, score2 = play_game(strategy1(), strategy2(), rounds=rounds, seed=seed + game, continuation=continuation)
+                score1, score2 = play_game(strategy1(), strategy2(), rounds=rounds, seed=seed + game, continuation=continuation, noise = noise)
                 total1 += score1
                 total2 += score2
             duels[(strategy1.nom, strategy2.nom)] = total1
