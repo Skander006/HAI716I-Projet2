@@ -226,6 +226,45 @@ Je pense que l'horizon inconnu va aider ALL-D. Les stratégies jouent pareil qu'
 
 Du coup, je m'attends à ce qu'ALL-D remonte beaucoup par rapport à l'étape 2 (elle était sixième) et qu'elle passe devant les stratégies gentilles.
 
+**Implémentation et test**
+
+J'ai ajouté au moteur un paramètre `continuation` (c'est w). Après chaque tour, on tire un nombre au hasard : s'il dépasse w, la partie s'arrête. Sans ce paramètre, le moteur joue toujours exactement 200 tours, donc les étapes 1 et 2 ne changent pas.
+
+J'ai fait un choix : ce tirage utilise son propre générateur, qui dépend seulement de la graine de la partie. Du coup, la partie n°1 a la même longueur pour toutes les paires, la partie n°2 aussi, etc. Je l'ai fait exprès : sinon, une stratégie pourrait gagner juste parce qu'elle est tombée sur des parties plus longues, et la comparaison ne serait plus juste.
+
+Pour vérifier, j'ai écrit un test : avec w = 0, une partie dure bien un seul tour ; la longueur est la même quelles que soient les stratégies ; et sur 2000 parties avec w = 0,995, la moyenne est de 204 tours, avec des parties d'un seul tour et d'autres de plus de 1500 tours.
+
+**Résultats**
+
+![Classement avec l'horizon inconnu](etape3_horizon.png)
+
+Le classement est **exactement le même qu'à l'étape 2** : GRUDGER reste première et ALL-D reste sixième. Les scores sont plus élevés, mais c'est seulement parce que les parties ont été plus longues : 1764 tours au total sur les 5 parties, au lieu de 1000.
+
+**Comparaison avec ma prédiction**
+
+Ma prédiction était fausse : ALL-D n'a pas remonté du tout. En cherchant pourquoi, j'ai regardé la longueur des 5 parties : 618, 137, 291, 401 et 317 tours. Il n'y a eu **aucune partie courte**. Or mon raisonnement reposait justement sur les parties courtes. Sur 137 tours ou plus, le premier tour gagné par ALL-D (5 points contre 0) ne pèse presque rien face aux 3 points par tour que les stratégies gentilles se donnent entre elles.
+
+J'ai relancé avec d'autres graines (0, 100, 1000) : le classement ne bouge pas. Ce n'est donc pas un hasard de la graine 42. Avec w = 0,995, les parties très courtes sont rares, et nos stratégies jouent exactement pareil quelle que soit la longueur, puisqu'aucune ne regarde le numéro du tour.
+
+**Expérience complémentaire : à partir de quand ALL-D gagne-t-elle ?**
+
+Je voulais savoir si mon idée était fausse, ou si les parties n'étaient juste pas assez courtes. J'ai donc relancé le tournoi avec des w plus petits. Comme les longueurs varient beaucoup d'une partie à l'autre, j'ai pris **200 parties par paire** au lieu de 5 pour que le hasard des longueurs s'équilibre. Cette expérience sort donc du protocole de référence, elle sert seulement à tester mon raisonnement.
+
+![Classement selon w](etape3_horizon_w.png)
+
+| w | Longueur moyenne | Rang d'ALL-D |
+|---|---|---|
+| 0,995 | environ 200 tours | 6e |
+| 0,9 | environ 10 tours | 3e |
+| 0,8 | environ 5 tours | 1re |
+| 0,5 | environ 2 tours | 1re |
+
+Mon idée n'était donc pas complètement fausse : quand les parties sont vraiment courtes, le premier tour pèse beaucoup et ALL-D finit par gagner. Mais il faut des parties d'environ 5 tours en moyenne, très loin des 200 tours de notre protocole.
+
+**Ce que j'en retiens**
+
+Je me suis trompé sur l'ordre de grandeur, pas sur le mécanisme. Ça rejoint le cours : pour que la coopération l'emporte, il n'est pas nécessaire que le jeu soit infini, il suffit que « le futur pèse assez lourd », c'est-à-dire que les joueurs aient de bonnes chances de se revoir. Avec w = 0,995, c'est largement le cas ; avec w = 0,8, ce n'est plus le cas, et trahir tout de suite devient la meilleure option.
+
 ---
 
 ## 7. Impasses
