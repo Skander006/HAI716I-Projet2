@@ -15,8 +15,9 @@ Ce tableau est complété au fur et à mesure du projet.
 | Tours par partie | 200 | format d'Axelrod |
 | Parties par paire | 5 | format d'Axelrod |
 | Graine | fixée dans le moteur (42) | résultats rejouables à l'identique |
+| Match contre soi-même | non (choix du moteur) | Axelrod l'incluait : effet discuté en partie 4 |
 | Population de l'étape 1 | ALL-D, RANDOM, TIT-FOR-TAT, TESTER, JOSS | imposée par l'énoncé |
-| Ma nouvelle stratégie (étape 2) | GRUDGER | voir partie 4 |
+| Ma nouvelle stratégie (étape 2) | GRUDGER | voir partie 5 |
 
 ---
 
@@ -88,9 +89,48 @@ Ces trahisons surprises devraient lui rapporter quelques points contre les strat
 
 ---
 
-## 4. Étape 2 — Ma nouvelle stratégie : GRUDGER (13/11)
+## 4. Étape 1 — Le premier tournoi (15/11)
 
-Pour l'étape 2, il fallait une stratégie absente du cours. J'ai hésité entre PAVLOV, TIT-FOR-TWO-TATS, TIT-FOR-TAT généreux et GRUDGER. J'ai choisi **GRUDGER**, « le rancunier ».
+Une fois mes stratégies fusionnées avec le moteur de Skander sur la branche `main`, nous avons pu lancer le vrai tournoi : les cinq stratégies du cours, 5 parties de 200 tours par paire, graine 42.
+
+![Classement de l'étape 1](etape1_classement.png)
+
+### 4.1. TIT-FOR-TAT ne gagne pas
+
+C'est ALL-D qui gagne, et TIT-FOR-TAT ne finit que troisième. Le résultat de 1980 n'est donc pas reproduit. Pour comprendre pourquoi, j'ai regardé le score de TIT-FOR-TAT contre chaque adversaire (total sur les 5 parties) :
+
+| TIT-FOR-TAT contre | Score de TFT | Ce qui se passe |
+|---|---|---|
+| ALL-D | 1990 | elle perd le premier tour, puis D/D jusqu'à la fin |
+| RANDOM | 2494 | ni exploitée, ni récompensée |
+| TESTER | 2500 | l'alternance D/C prévue en 3.4 |
+| JOSS | 2021 | les représailles en écho prévues en 3.5 |
+
+TIT-FOR-TAT n'atteint jamais 3000 points, c'est-à-dire 3 points par tour : dans cette population, **aucun adversaire ne coopère vraiment avec elle**. TESTER la teste, JOSS triche, RANDOM joue au hasard. Or sa force vient justement de la coopération avec les autres stratégies gentilles.
+
+ALL-D, de son côté, a une proie : contre RANDOM, elle marque 3494 points, son meilleur score. C'est ce qui la fait passer devant tout le monde.
+
+### 4.2. Pourquoi notre résultat diffère de celui de 1980
+
+Je vois deux différences avec le tournoi d'Axelrod :
+
+1. **La taille et la nature de la population.** En 1980, il y avait 14 programmes, et la plupart commençaient par coopérer. TIT-FOR-TAT trouvait donc beaucoup de partenaires avec qui gagner 3 points par tour. Ici, avec cinq stratégies dont aucune n'est vraiment gentille à part elle, elle n'en a aucun.
+2. **Les matchs contre soi-même.** Axelrod faisait jouer chaque programme contre son jumeau ; notre moteur ne le fait pas. J'ai mesuré ces matchs avec le même moteur : TIT-FOR-TAT contre elle-même marque 3000 points, ALL-D contre elle-même seulement 2000. En les ajoutant, TIT-FOR-TAT repasse en tête (environ 12 000 points contre 11 700 pour TESTER et 11 500 pour ALL-D).
+
+Ce résultat rejoint ce que dit le cours : TIT-FOR-TAT n'est pas « la » stratégie optimale, elle prospère seulement s'il y a assez de stratégies qui pensent comme elle.
+
+### 4.3. Ce que je retiens par rapport à mes avis
+
+- ALL-D gagne, mais uniquement grâce à une proie facile (RANDOM) : c'est ce que j'avais envisagé en 3.1.
+- RANDOM finit dernière, comme prévu en 3.2.
+- Les deux comportements que j'avais repérés en déroulant les parties à la main se retrouvent dans les scores : l'alternance TESTER/TIT-FOR-TAT (2500 de chaque côté) et l'écho JOSS/TIT-FOR-TAT.
+- Une surprise : TESTER finit deuxième, devant TIT-FOR-TAT. Son D d'ouverture lui coûte contre TIT-FOR-TAT, mais elle exploite RANDOM et JOSS un peu mieux que TIT-FOR-TAT.
+
+---
+
+## 5. Étape 2 — Ma nouvelle stratégie : GRUDGER
+
+Pour l'étape 2, il fallait une stratégie absente du cours. Je l'ai écrite le 13/11, juste après les cinq stratégies du cours. J'ai hésité entre PAVLOV, TIT-FOR-TWO-TATS, TIT-FOR-TAT généreux et GRUDGER. J'ai choisi **GRUDGER**, « le rancunier ».
 
 Sa règle : je coopère tant que tu n'as jamais trahi ; à ta première trahison, je joue D jusqu'à la fin. Elle vient de James Friedman, qui l'avait soumise au tournoi d'Axelrod ; on la connaît aussi sous le nom de *Grim Trigger*.
 
@@ -100,6 +140,6 @@ Je m'attends à ce qu'elle joue très bien contre les stratégies gentilles, ave
 
 ---
 
-## 5. Impasses
+## 6. Impasses
 
 - **La règle de TESTER ne suffisait pas.** Au départ, je pensais coder TESTER directement à partir de la phrase du cours. En réalité, elle ne dit pas ce qu'est une riposte ni si le passage en TIT-FOR-TAT est définitif. J'ai dû faire deux choix, expliqués en 3.4. En déroulant les parties à la main, j'ai vu qu'avec ces choix, TESTER contre TIT-FOR-TAT ne revient jamais à la coopération. Une autre interprétation aurait pu donner un comportement très différent.
