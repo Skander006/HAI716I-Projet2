@@ -558,6 +558,57 @@ Cette question constitue une motivation directe pour l'étape 3, dans laquelle n
 
 #### 2.3.1. Hypothèses initiales
 
+Pour cette troisième étape, nous avons décidé de modifier deux paramètres du tournoi afin d'étudier la robustesse des stratégies dans des conditions différentes de celles du protocole initial.
+
+Les deux modifications choisies sont :
+
+- L'introduction d'un bruit de 5 % sur les actions exécutées.
+- Le remplacement de la durée fixe de 200 tours par un horizon inconnu, avec une probabilité de continuation de 0,995 après chaque tour.
+
+Ces modifications seront étudiées séparément afin de pouvoir identifier leur influence respective sur les résultats.
+
+Voici mes prédictions pour les deux nouvelles modifications potentielles :
+
+**a) Première modification : introduction d'un bruit de 5 %**
+
+Dans le tournoi initial, les actions choisies par les stratégies sont toujours exécutées correctement.
+
+Nous souhaitons maintenant introduire une probabilité de 5 % qu'une action soit inversée lors de son exécution : une coopération C peut devenir une défection D, et inversement.
+
+Cette modification permet de simuler des erreurs de communication ou d'exécution.
+
+Je suppose que ce bruit perturbera particulièrement les stratégies qui réagissent fortement aux défections.
+
+GRUDGER, qui a remporté le tournoi précédent, risque de perdre son avantage. En effet, une seule défection accidentelle suffit à déclencher une punition permanente, même contre un adversaire qui souhaitait coopérer.
+
+TIT-FOR-TAT pourrait également rencontrer des difficultés. Une défection accidentelle peut provoquer des représailles réciproques, entraînant une alternance durable entre coopération et défection.
+
+À l'inverse, TIT-FOR-TWO-TATS pourrait mieux résister aux erreurs isolées, puisqu'elle ne sanctionne que deux défections consécutives.
+
+**Mon hypothèse principale est donc que TIT-FOR-TWO-TATS progressera dans le classement, tandis que GRUDGER reculera.**
+
+Je ne suppose cependant pas que TIT-FOR-TWO-TATS terminera nécessairement première : sa tolérance peut toujours être exploitée par des stratégies comme TESTER.
+
+**b) Deuxième modification : horizon inconnu**
+
+Dans les expériences précédentes, chaque partie durait exactement 200 tours.
+
+Nous souhaitons maintenant introduire un horizon inconnu : après chaque tour, la partie continue avec une probabilité `w = 0,995` et s'arrête avec une probabilité de 0,005.
+
+La durée devient donc aléatoire. Avec cette valeur de `w`, le nombre moyen de tours est de 200, ce qui permet de conserver une durée moyenne comparable à celle du tournoi initial.
+
+Cette modification est intéressante car elle supprime la connaissance du dernier tour.
+
+Dans un dilemme du prisonnier répété avec une durée connue, la défection peut être justifiée par un raisonnement à rebours : au dernier tour, il n'existe plus de possibilité de représailles futures.
+
+Avec un horizon inconnu, ce raisonnement ne s'applique plus de la même manière, car les joueurs ne savent pas quand la partie se terminera.
+
+Je suppose néanmoins que cette modification pourrait avantager ALL-D dans certaines confrontations courtes. En effet, ALL-D exploite immédiatement les stratégies qui commencent par coopérer, alors que celles-ci ont besoin de plusieurs tours pour réagir.
+
+Cependant, les parties longues pourraient continuer à favoriser les stratégies capables de maintenir une coopération stable, comme TIT-FOR-TAT et GRUDGER.
+
+**Mon hypothèse principale est donc que l'horizon inconnu modifiera les écarts de scores et pourrait améliorer le classement d'ALL-D, sans garantir qu'elle remporte le tournoi.**
+
 #### 2.3.2. Implémentation
 
 #### 2.3.3. Tests et difficultés
