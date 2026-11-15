@@ -2,6 +2,18 @@ from engine.tournament import run_tournament
 from strategies_base.strategies import (AllD, Random, TitForTat, Tester,Joss, Grudger, TitForTwoTats)
 from engine.tournament import run_duels
 
+strategies_cours = [AllD, Random, TitForTat, Tester, Joss]
+
+print("\n=== CLASSEMENT ÉTAPE 1 (5 stratégies du cours, sans auto-rencontres) ===")
+resultats_etape1 = run_tournament(strategies_cours,games_per_pair=5,rounds=200,seed=42,self_play=False)
+for rang, (nom, score) in enumerate(resultats_etape1, 1):
+    print(f"{rang}. {nom:<20} : {score} points")
+
+print("\n=== CLASSEMENT ÉTAPE 1 (5 stratégies du cours, avec auto-rencontres) ===")
+resultats_etape1_soi = run_tournament(strategies_cours,games_per_pair=5,rounds=200,seed=42,self_play=True)
+for rang, (nom, score) in enumerate(resultats_etape1_soi, 1):
+    print(f"{rang}. {nom:<20} : {score} points")
+
 strategies = [AllD, Random, TitForTat, Tester,Joss, Grudger, TitForTwoTats]
 resultats = run_tournament(strategies)
 
@@ -39,6 +51,11 @@ for strategie in strategies:
             print(f"{score:>{largeur}}", end="")
 
     print(f"{total:>10}")
+
+print("\n=== CLASSEMENT ÉTAPE 2 (avec auto-rencontres) ===")
+resultats_etape2_soi = run_tournament(strategies,games_per_pair=5,rounds=200,seed=42,self_play=True)
+for rang, (nom, score) in enumerate(resultats_etape2_soi, 1):
+    print(f"{rang}. {nom:<20} : {score} points")
 
 print("\n=== TOURNOI SANS BRUIT (0 %) ===")
 resultats_sans_bruit = run_tournament(strategies,games_per_pair=5,rounds=200,seed=42,self_play=False,noise=0.0)
@@ -92,3 +109,13 @@ for w in (0.995, 0.9, 0.8, 0.5):
     classement = [nom for nom, score in resultats_w]
     print(f"\nw = {w} (environ {round(1 / (1 - w))} tours par partie) : ALL-D est {classement.index('ALL-D') + 1}e")
     print("   " + " > ".join(classement))
+
+print("\n=== BRUIT 5 % : CLASSEMENT AVEC D'AUTRES GRAINES ===")
+for graine in range(10):
+    classement = [nom for nom, score in run_tournament(strategies,games_per_pair=5,rounds=200,seed=graine,self_play=False,noise=0.05)]
+    print(f"graine {graine} : " + " > ".join(classement))
+
+print("\n=== HORIZON INCONNU (w = 0.995) : CLASSEMENT AVEC D'AUTRES GRAINES ===")
+for graine in (0, 100, 1000):
+    classement = [nom for nom, score in run_tournament(strategies,games_per_pair=5,rounds=200,seed=graine,self_play=False,continuation=0.995)]
+    print(f"graine {graine} : " + " > ".join(classement))
