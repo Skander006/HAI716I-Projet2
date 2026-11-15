@@ -1006,6 +1006,140 @@ Elles confirment qu'aucune stratégie ne peut être considérée comme universel
 
 ## Partie 3 — Bilan final
 
-### 3.1. Synthèse des résultats
+### 3.1. Difficultés rencontrées et solutions apportées
 
-### 3.2. Limites et améliorations possibles
+Au cours de ce projet, j'ai rencontré plusieurs difficultés liées à la conception du moteur de jeu, à l'implémentation des stratégies et à l'interprétation des résultats expérimentaux.
+
+Ces difficultés m'ont permis de mieux comprendre l'importance des tests, de la reproductibilité et de la rigueur dans la conception d'un système multi-agent.
+
+**a) Garantir la simultanéité des décisions**
+
+L'une des premières difficultés concernait le fonctionnement du moteur du dilemme du prisonnier itéré.
+
+Les deux joueurs doivent choisir leurs actions simultanément, sans connaître la décision actuelle de leur adversaire.
+
+Il fallait donc éviter qu'une stratégie puisse accéder au coup choisi par l'autre joueur pendant le même tour.
+
+Pour résoudre ce problème, j'ai organisé le moteur en trois étapes :
+
+1. Chaque stratégie choisit son action à partir des historiques des tours précédents.
+2. Le moteur calcule les gains des deux joueurs.
+3. Les historiques sont mis à jour avec les actions exécutées.
+
+Cette organisation garantit que les deux décisions sont prises à partir des mêmes informations temporelles.
+
+**b) Assurer la cohérence entre le tournoi et les duels**
+
+Pour comprendre les classements, nous avons ajouté une fonction `run_duels()` permettant d'obtenir les scores de chaque confrontation.
+
+Une difficulté importante était de garantir que les scores individuels correspondent exactement aux scores cumulés par `run_tournament()`.
+
+En effet, certaines stratégies utilisent des tirages pseudo-aléatoires, et l'ordre des joueurs peut influencer les résultats obtenus avec une graine donnée.
+
+Nous avons donc conservé le même ordre des confrontations et les mêmes graines dans les deux fonctions.
+
+Nous avons ensuite vérifié que la somme des scores individuels de chaque stratégie correspondait à son score dans le tournoi.
+
+Par exemple, avec un bruit de 5 %, la somme des duels de JOSS donne exactement 14 415 points, soit son score au classement général.
+
+Cette vérification nous a permis de fiabiliser nos analyses.
+
+**c) Introduire le bruit sans perturber le moteur existant**
+
+Lors de la troisième étape, ma principale difficulté technique était d'introduire une probabilité d'erreur de 5 % tout en préservant le fonctionnement des stratégies et des expériences précédentes.
+
+J'ai choisi d'utiliser un générateur pseudo-aléatoire distinct pour le bruit, afin de ne pas modifier les tirages utilisés par les stratégies RANDOM et JOSS ou par l'horizon inconnu.
+
+J'ai également veillé à appliquer le bruit après le choix des actions, mais avant le calcul des gains et la mise à jour des historiques.
+
+Pour vérifier cette modification, j'ai testé trois situations :
+
+- Un bruit nul (`noise=0.0`), qui conserve les actions choisies.
+- Un bruit maximal (`noise=1.0`), qui inverse systématiquement les actions.
+- Un bruit de 5 % avec une graine fixe, pour vérifier la reproductibilité.
+
+Les trois tests ont réussi.
+
+J'ai ensuite relancé le tournoi sans bruit et retrouvé exactement les résultats de l'étape 2, ce qui a confirmé que la modification n'avait pas perturbé le protocole initial.
+
+**d) Comprendre des résultats contraires à mes hypothèses**
+
+Une dernière difficulté était liée à l'interprétation des résultats.
+
+Avant l'expérience avec bruit, je pensais que TIT-FOR-TWO-TATS progresserait grâce à sa tolérance aux défections isolées.
+
+Pourtant, elle est passée de la quatrième à la sixième place.
+
+À l'inverse, JOSS est passée de la cinquième à la première place.
+
+J'ai donc analysé les duels individuels pour comprendre ces résultats plutôt que de conserver mon hypothèse initiale.
+
+J'ai notamment observé que TIT-FOR-TWO-TATS n'obtenait plus que 1 941 points contre GRUDGER, contre 3 000 sans bruit.
+
+Cette observation m'a montré que la tolérance aux erreurs ne suffit pas toujours à maintenir la coopération, notamment face à une stratégie qui sanctionne définitivement une défection.
+
+J'ai également constaté que JOSS ne devançait ALL-D que de trois points avec la graine 42.
+
+Pour éviter de tirer une conclusion trop générale, nous avons réalisé des expériences complémentaires avec dix graines différentes.
+
+JOSS a terminé première dans neuf de ces dix expériences.
+
+Cette démarche m'a appris à considérer une hypothèse comme une proposition à tester, et non comme une conclusion à défendre à tout prix.
+
+**Bilan**
+
+Ces difficultés ont été importantes dans ma progression pendant le projet.
+
+Elles m'ont appris à vérifier les comportements des agents avec des tests ciblés, à contrôler les sources d'aléatoire et à analyser les résultats à partir de données expérimentales.
+
+J'ai surtout compris qu'obtenir un classement ne suffit pas : il faut également être capable d'expliquer les mécanismes qui produisent les résultats et de reconnaître les limites de ses conclusions.
+
+### 3.2. Ce que j'ai appris
+
+Ce projet m'a permis de mieux comprendre les interactions entre agents autonomes et les mécanismes qui favorisent la coopération dans le dilemme du prisonnier itéré.
+
+**a) L'importance des adversaires**
+
+Au début, je pensais qu'une stratégie comme ALL-D, qui cherche à maximiser ses gains immédiats, serait particulièrement efficace.
+
+Elle a effectivement remporté le premier tournoi. Cependant, après l'ajout de GRUDGER et TIT-FOR-TWO-TATS, elle est descendue à la sixième place.
+
+J'ai compris que les performances d'une stratégie dépendent fortement des adversaires présents. Une stratégie gagnante dans une population peut devenir beaucoup moins efficace dans une autre.
+
+**b) La coopération et le pardon**
+
+La comparaison entre GRUDGER et TIT-FOR-TWO-TATS m'a montré que la coopération peut produire de meilleurs gains à long terme que la défection systématique.
+
+Sans bruit, GRUDGER remporte le tournoi grâce à sa capacité à coopérer durablement avec certaines stratégies.
+
+Avec un bruit de 5 %, elle perd sa première place, car une simple erreur peut déclencher une punition permanente.
+
+Je pensais que TIT-FOR-TWO-TATS profiterait de sa tolérance aux défections isolées, mais elle a finalement reculé au classement. J'ai compris que pardonner ne suffit pas toujours : le comportement de l'adversaire compte également.
+
+**c) L'influence du bruit et de l'horizon inconnu**
+
+L'introduction d'un bruit de 5 % a profondément modifié le classement, avec JOSS passant de la cinquième à la première place.
+
+Cela m'a montré qu'une petite probabilité d'erreur peut avoir des conséquences importantes sur les interactions entre agents.
+
+L'expérience avec horizon inconnu m'a également appris que la durée attendue des interactions influence la coopération. Lorsque les parties deviennent très courtes, ALL-D devient plus compétitive et finit même première pour certaines probabilités de continuation.
+
+**d) L'importance de la démarche expérimentale**
+
+Enfin, j'ai appris qu'il ne suffit pas d'obtenir un classement : il faut comprendre et expliquer les résultats.
+
+L'utilisation de graines fixes, des tests unitaires et l'analyse des duels nous ont permis de vérifier nos implémentations et de confronter nos hypothèses aux observations.
+
+Les expériences avec plusieurs graines m'ont également montré l'importance de la reproductibilité.
+
+**Bilan personnel**
+
+Ce que je retiens principalement, c'est qu'aucune stratégie n'est universellement gagnante dans nos expériences. Ses performances dépendent de la population, des erreurs et de la durée des interactions.
+
+Ce projet m'a surtout appris à raisonner de manière expérimentale : formuler des hypothèses, les tester, accepter les résultats inattendus et chercher à les expliquer.
+
+### 3.3. Bilan de ma contribution personnelle
+
+
+### 3.4. Limites et améliorations possibles
+
