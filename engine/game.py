@@ -14,12 +14,14 @@ def get_payoffs(action1, action2):
         raise ValueError("L'une des actions est incorrecte !")
 
 
-def play_game(strategy1, strategy2,rounds = 200, seed = 42):
+def play_game(strategy1, strategy2,rounds = 200, seed = 42, continuation = None):
     history1, history2 = [], []
     score1, score2 = 0, 0
     rng1 = random.Random(seed)
     rng2 = random.Random(seed + 1)
-    for i in range (rounds):
+    rng_fin = random.Random(seed + 2)
+    played = 0
+    while continuation is not None or played < rounds:
         action1 = strategy1.jouer(history1, history2, rng1)
         action2 = strategy2.jouer(history2, history1, rng2)
         history1.append(action1)
@@ -27,6 +29,9 @@ def play_game(strategy1, strategy2,rounds = 200, seed = 42):
         gain1, gain2 = get_payoffs(action1, action2)
         score1 += gain1
         score2 += gain2
+        played += 1
+        if continuation is not None and rng_fin.random() >= continuation:
+            break
     return score1, score2
     
     
