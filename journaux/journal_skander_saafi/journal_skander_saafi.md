@@ -1140,6 +1140,45 @@ Ce projet m'a surtout appris à raisonner de manière expérimentale : formuler 
 
 ### 3.3. Bilan de ma contribution personnelle
 
+Dans ce projet, nous avons travaillé en binôme avec Abdellah DORBANE, en nous répartissant les tâches tout en conservant un dépôt Git commun.
+
+**a) Développement du moteur et du tournoi**
+
+Ma principale contribution a été la conception et l'implémentation du moteur de jeu en Python.
+
+J'ai développé la gestion des actions, le calcul des gains, les historiques des joueurs et le déroulement des parties. J'ai également implémenté le tournoi permettant à chaque stratégie d'affronter les autres et de calculer un classement général.
+
+J'ai veillé à rendre les expériences reproductibles grâce à l'utilisation de graines pseudo-aléatoires fixes.
+
+**b) Implémentation de TIT-FOR-TWO-TATS**
+
+Pour la deuxième étape, j'ai choisi et développé la stratégie TIT-FOR-TWO-TATS, qui ne riposte qu'après deux défections consécutives de son adversaire.
+
+J'ai testé son comportement et corrigé une erreur concernant son premier coup.
+
+Cette contribution m'a permis d'étudier les avantages et les limites d'une stratégie plus tolérante que TIT-FOR-TAT.
+
+**c) Introduction du bruit de 5 %**
+
+Pour la troisième étape, j'ai été responsable de l'implémentation du bruit.
+
+J'ai ajouté la possibilité d'inverser aléatoirement les actions exécutées, en utilisant un générateur pseudo-aléatoire indépendant.
+
+J'ai ensuite réalisé plusieurs tests pour vérifier le fonctionnement de cette modification, puis analysé son influence sur le classement et les confrontations individuelles.
+
+**d) Collaboration et organisation**
+
+Abdellah s'est principalement occupé des cinq stratégies initiales, de GRUDGER, de la fonction d'analyse des duels et de l'horizon inconnu.
+
+Nous avons régulièrement intégré nos modifications dans le dépôt commun et vérifié leur compatibilité.
+
+Cette organisation m'a appris à concevoir des composants indépendants, à respecter une interface commune et à collaborer efficacement sur un projet informatique.
+
+**Bilan**
+
+Je considère que ma contribution principale a été de construire une base technique fiable et extensible, permettant d'expérimenter différentes stratégies et de modifier les conditions du tournoi sans réécrire l'ensemble du programme.
+
+Ce projet m'a permis de progresser à la fois en programmation Python, en conception logicielle, en expérimentation et en travail collaboratif.
 
 ### 3.4. Limites et améliorations possibles
 
