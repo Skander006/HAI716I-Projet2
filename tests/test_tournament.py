@@ -1,4 +1,4 @@
-from engine.tournament import run_tournament
+from engine.tournament import run_tournament, run_duels
 
 class AlwaysCooperate:
     nom = "ALL-C"
@@ -59,10 +59,21 @@ def test_self_play():
         print(f"{rang}. {nom} : {score} points")
     print("\nTest des auto-rencontres réussi !")
 
+def test_duels():
+    duels = run_duels([TitForTat, AlwaysDefect], games_per_pair=1, rounds=10)
+    assert duels == {("TIT-FOR-TAT", "ALL-D"): 18, ("ALL-D", "TIT-FOR-TAT"): 23}
+    strategies = [AlwaysCooperate, AlwaysDefect, TitForTat]
+    for sp in (False, True):
+        duels = run_duels(strategies, self_play=sp)
+        for nom, score in run_tournament(strategies, self_play=sp):
+            assert sum(s for (a, b), s in duels.items() if a == nom) == score
+    print("Test des duels réussi !")
+
 if __name__ == "__main__":
     test_tournament_scores()
     test_tournament_ranking()
     test_reproducibility()
     test_games_per_pair()
     test_self_play()
+    test_duels()
     print("\nTous les tests du tournoi sont réussis !")
