@@ -611,6 +611,44 @@ Cependant, les parties longues pourraient continuer à favoriser les stratégies
 
 #### 2.3.2. Implémentation
 
+**a) Répartition du travail**
+
+Pour cette troisième étape, nous avons réparti les deux modifications du tournoi entre les membres du binôme.
+
+De mon côté, j'ai pris en charge l'introduction d'un bruit de 5 % sur les actions exécutées. Mon binôme s'est occupé de l'horizon inconnu, avec une probabilité de continuation de 0,995.
+
+Les deux modifications ont été intégrées dans le moteur commun, tout en conservant la possibilité d'exécuter les expériences précédentes.
+
+**b) Introduction du bruit dans le moteur**
+
+J'ai ajouté un paramètre `noise`, initialisé à `0.0` par défaut, à la fonction `play_game()`.
+
+À chaque tour, les deux stratégies choisissent d'abord leurs actions selon leurs règles habituelles.
+
+Le moteur applique ensuite le bruit à chacune des deux actions, à l'aide de tirages pseudo-aléatoires distincts. Avec une probabilité de 5 %, une action C devient D ou une action D devient C.
+
+Les gains sont calculés à partir des actions réellement exécutées, et les historiques sont mis à jour avec ces mêmes actions.
+
+Cette décision est importante : une stratégie peut ainsi observer une défection accidentelle et y réagir comme s'il s'agissait d'une défection volontaire.
+
+**c) Gestion de l'aléatoire et reproductibilité**
+
+Pour éviter que les tirages liés au bruit ne perturbent les décisions aléatoires des stratégies, j'ai introduit un générateur pseudo-aléatoire distinct, initialisé à partir de `seed + 3`.
+
+Les générateurs utilisés par les stratégies et par l'horizon inconnu restent séparés.
+
+Ce choix permet de reproduire une expérience avec les mêmes paramètres et la même graine.
+
+**d) Intégration au tournoi**
+
+J'ai ensuite ajouté le paramètre `noise` aux fonctions `run_tournament()` et `run_duels()`.
+
+Ces fonctions transmettent désormais la probabilité de bruit à `play_game()` pour chaque confrontation.
+
+Le paramètre reste désactivé par défaut, ce qui garantit la compatibilité avec les expériences précédentes.
+
+Cette architecture permet de comparer directement le tournoi initial et le tournoi bruité, sans modifier les règles des sept stratégies.
+
 #### 2.3.3. Tests et difficultés
 
 #### 2.3.4. Résultats et analyse
