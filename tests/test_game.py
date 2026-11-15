@@ -44,14 +44,18 @@ class AlwaysCooperate:
 def test_noise_zero():
     s1, s2 = play_game(AlwaysCooperate(),AlwaysCooperate(),rounds=200,noise=0.0)
     assert (s1, s2) == (600, 600)
+    print("Test du bruit nul réussi !")
+
 def test_noise_one():
     s1, s2 = play_game(AlwaysCooperate(),AlwaysCooperate(),rounds=200,noise=1.0)
     assert (s1, s2) == (400, 400)
+    print("Test du bruit égal à 1 réussi !")
 
 def test_noise_reproducibility():
     result1 = play_game(AlwaysCooperate(),AlwaysCooperate(),rounds=200,seed=42,noise=0.05)
     result2 = play_game(AlwaysCooperate(),AlwaysCooperate(),rounds=200,seed=42,noise=0.05)
     assert result1 == result2
+    print("Tests de la reproductibilité de bruit réussi !")
 
 def test_horizon_inconnu():
     assert play_game(AlwaysCooperate(), AlwaysCooperate(), continuation=0) == (3, 3)

@@ -651,6 +651,116 @@ Cette architecture permet de comparer directement le tournoi initial et le tourn
 
 #### 2.3.3. Tests et difficultés
 
+**a) Vérification du fonctionnement du bruit**
+
+Après avoir intégré le paramètre `noise` dans le moteur, j'ai réalisé plusieurs tests afin de vérifier que les actions étaient correctement inversées selon la probabilité définie.
+
+Pour isoler le comportement du bruit, j'ai utilisé deux stratégies ALL-C, qui choisissent systématiquement de coopérer.
+
+Trois configurations ont été testées :
+
+| Test | Paramètre | Résultat attendu | Résultat obtenu |
+|---|---|---|---|
+| Sans bruit | `noise=0.0` | 600 points pour chaque joueur | Test réussi |
+| Bruit maximal | `noise=1.0` | 400 points pour chaque joueur | Test réussi |
+| Reproductibilité | `noise=0.05`, `seed=42` | Résultats identiques sur deux exécutions | Test réussi |
+
+**Test 1 — Absence de bruit**
+
+Avec `noise=0.0`, les deux stratégies ALL-C coopèrent pendant les 200 tours.
+
+Chaque joueur obtient donc 3 points par tour, soit :
+
+`200 × 3 = 600 points`
+
+Le test a réussi, ce qui confirme que le moteur conserve le comportement attendu lorsque le bruit est désactivé.
+
+**Test 2 — Bruit maximal**
+
+Avec `noise=1.0`, toutes les actions choisies sont inversées.
+
+Les deux stratégies ALL-C choisissent C, mais leurs actions sont systématiquement transformées en D.
+
+Chaque joueur obtient alors 2 points par tour, soit :
+
+`200 × 2 = 400 points`
+
+Le test a réussi, ce qui vérifie le mécanisme d'inversion des actions.
+
+**Test 3 — Reproductibilité du bruit**
+
+Avec `noise=0.05`, j'ai exécuté deux fois la même confrontation en conservant la graine `seed=42`.
+
+Les deux exécutions ont produit les mêmes scores.
+
+Ce résultat confirme que les tirages pseudo-aléatoires sont reproductibles lorsque les paramètres restent identiques.
+
+**b) Vérification de la compatibilité avec le tournoi initial**
+
+Après les tests unitaires, j'ai relancé le tournoi des sept stratégies avec `noise=0.0`.
+
+Le classement obtenu était identique à celui de l'étape 2 :
+
+| Rang | Stratégie | Score |
+|---|---|---:|
+| 1 | GRUDGER | 15 493 |
+| 2 | TIT-FOR-TAT | 15 009 |
+| 3 | TESTER | 14 697 |
+| 4 | TIT-FOR-TWO-TATS | 14 630 |
+| 5 | JOSS | 13 957 |
+| 6 | ALL-D | 13 581 |
+| 7 | RANDOM | 12 585 |
+
+**Capture d'écran des tests :**
+
+![Classement des strategies avec bruit de 0.0](classement_bruit_nul.png)
+
+Cette capture d'ecran a été prise à partir du main.py
+
+Cette vérification montre que l'ajout du paramètre `noise` n'a pas modifié les résultats du protocole de référence lorsque le bruit est désactivé.
+
+**c) Vérification de la cohérence des résultats**
+
+Pour analyser les confrontations individuelles, j'ai également utilisé `run_duels()` avec `noise=0.05`.
+
+J'ai vérifié que les scores des duels correspondaient aux scores cumulés du tournoi.
+
+Par exemple, JOSS obtient les résultats suivants :
+
+| Adversaire | Score de JOSS |
+|---|---:|
+| ALL-D | 1 958 |
+| RANDOM | 2 632 |
+| TIT-FOR-TAT | 2 348 |
+| TESTER | 2 335 |
+| GRUDGER | 2 020 |
+| TIT-FOR-TWO-TATS | 3 122 |
+| **Total** | **14 415** |
+
+La somme correspond exactement au score de JOSS dans le classement général.
+
+Cette cohérence permet d'utiliser les résultats individuels pour expliquer les performances observées.
+
+**d) Difficultés et précautions techniques**
+
+La principale difficulté technique de cette modification était d'introduire de l'aléatoire sans perturber les mécanismes déjà présents dans le moteur.
+
+En particulier, RANDOM et JOSS utilisent leurs propres tirages aléatoires pour choisir leurs actions.
+
+J'ai donc utilisé un générateur distinct pour le bruit, afin de séparer les erreurs d'exécution des décisions prises par les stratégies.
+
+Une autre précaution importante concernait l'ordre des opérations : les stratégies doivent d'abord choisir leurs actions, puis le bruit est appliqué avant le calcul des gains et la mise à jour des historiques.
+
+Ainsi, les stratégies réagissent aux actions réellement exécutées, y compris lorsqu'elles résultent d'une erreur.
+
+**e) Bilan des tests**
+
+Les trois tests du bruit ont réussi, et le tournoi sans bruit reproduit les résultats précédents.
+
+Les résultats des duels sont également cohérents avec les scores cumulés du tournoi bruité.
+
+Ces vérifications renforcent la confiance dans l'implémentation, même si elles ne démontrent pas à elles seules que tous les comportements possibles ont été testés.
+
 #### 2.3.4. Résultats et analyse
 
 ## Partie 3 — Bilan final
