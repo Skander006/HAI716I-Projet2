@@ -68,3 +68,15 @@ class Grudger:
         if D in ses_coups:
             return D
         return C
+
+class TitForTwoTats:
+    nom = 'TIT-FOR-TWO-TATS'
+
+    def jouer(self, mes_coups, ses_coups, rng):
+        if len(ses_coups) < 2:
+            return C
+
+        if ses_coups[-1] == D and ses_coups[-2] == D:
+            return D
+        return C
+
