@@ -51,3 +51,18 @@ for rang, (nom, score) in enumerate(resultats_avec_bruit, 1):
     print(f"{rang}. {nom:<20} : {score} points")
 
 
+duels_bruit = run_duels(strategies,games_per_pair=5,rounds=200,seed=42,self_play=False,noise=0.05)
+noms = [strategie.nom for strategie in strategies]
+print("\n=== DUELS AVEC BRUIT DE 5 % ===")
+print(f"{'Stratégie':<20}", end="")
+for nom in noms:
+    print(f"{nom[:10]:>12}", end="")
+print()
+for nom1 in noms:
+    print(f"{nom1:<20}", end="")
+    for nom2 in noms:
+        if nom1 == nom2:
+            print(f"{'-':>12}", end="")
+        else:
+            print(f"{duels_bruit[(nom1, nom2)]:>12}", end="")
+    print()
