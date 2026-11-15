@@ -39,3 +39,15 @@ for strategie in strategies:
             print(f"{score:>{largeur}}", end="")
 
     print(f"{total:>10}")
+
+print("\n=== TOURNOI SANS BRUIT (0 %) ===")
+resultats_sans_bruit = run_tournament(strategies,games_per_pair=5,rounds=200,seed=42,self_play=False,noise=0.0)
+for rang, (nom, score) in enumerate(resultats_sans_bruit, 1):
+    print(f"{rang}. {nom:<20} : {score} points")
+
+print("\n=== TOURNOI AVEC BRUIT (5 %) ===")
+resultats_avec_bruit = run_tournament(strategies,games_per_pair=5,rounds=200,seed=42,self_play=False,noise=0.05)
+for rang, (nom, score) in enumerate(resultats_avec_bruit, 1):
+    print(f"{rang}. {nom:<20} : {score} points")
+
+

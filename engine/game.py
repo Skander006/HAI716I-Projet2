@@ -17,7 +17,7 @@ def get_payoffs(action1, action2):
 def play_game(strategy1, strategy2,rounds = 200, seed = 42, continuation = None,  noise=0.0):
     if not 0 <= noise <= 1:
         raise ValueError("noise doit être compris entre 0 et 1")
-    if continuation is not None and not 0 <= continuation <= 1:
+    if continuation is not None and not 0 <= continuation < 1:
         raise ValueError("continuation doit être strictement compris entre 0 et 1")
 
     history1, history2 = [], []
