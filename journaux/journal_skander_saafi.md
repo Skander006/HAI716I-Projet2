@@ -1,7 +1,7 @@
 # Journal de bord — Projet 2 : Dilemme du prisonnier itéré
 
 **Étudiant :** Skander SAAFI  
-**UE :** HAI716I — Programmation Orientée Agents  
+**UE :** HAI716I - Programmation Orientée Agents  
 **Langage :** Python
 
 ## 1. Organisation du travail
@@ -32,7 +32,10 @@ Dans cette première version, les paires inversées et les auto-rencontres sont 
 J'ai testé le moteur avec trois stratégies simples : ALL-C, ALL-D et TIT-FOR-TAT.
 Les tests automatiques ont permis de vérifier la matrice des gains, les scores cumulés, le classement et la reproductibilité. Tous les tests ont réussi.
 
+*Capture d'écran des tests réussis : ![Résultats des tests du moteur et du tournoi](img.png)*
+
 J'ai également résolu des problèmes d'importation entre modules Python et ajouté l'attribut `nom` aux stratégies de test pour permettre leur classement.
+
 ### 2.3. Résultats et analyse des cinq stratégies
 
 
