@@ -66,3 +66,29 @@ for nom1 in noms:
         else:
             print(f"{duels_bruit[(nom1, nom2)]:>12}", end="")
     print()
+print("\n=== TOURNOI AVEC HORIZON INCONNU (w = 0.995) ===")
+resultats_horizon = run_tournament(strategies,games_per_pair=5,rounds=200,seed=42,self_play=False,continuation=0.995)
+for rang, (nom, score) in enumerate(resultats_horizon, 1):
+    print(f"{rang}. {nom:<20} : {score} points")
+
+duels_horizon = run_duels(strategies,games_per_pair=5,rounds=200,seed=42,self_play=False,continuation=0.995)
+print("\n=== DUELS AVEC HORIZON INCONNU (w = 0.995) ===")
+print(f"{'Stratégie':<20}", end="")
+for nom in noms:
+    print(f"{nom[:10]:>12}", end="")
+print()
+for nom1 in noms:
+    print(f"{nom1:<20}", end="")
+    for nom2 in noms:
+        if nom1 == nom2:
+            print(f"{'-':>12}", end="")
+        else:
+            print(f"{duels_horizon[(nom1, nom2)]:>12}", end="")
+    print()
+
+print("\n=== HORIZON INCONNU : EXPERIENCE COMPLEMENTAIRE (200 parties par paire) ===")
+for w in (0.995, 0.9, 0.8, 0.5):
+    resultats_w = run_tournament(strategies,games_per_pair=200,seed=42,self_play=False,continuation=w)
+    classement = [nom for nom, score in resultats_w]
+    print(f"\nw = {w} (environ {round(1 / (1 - w))} tours par partie) : ALL-D est {classement.index('ALL-D') + 1}e")
+    print("   " + " > ".join(classement))
