@@ -212,6 +212,44 @@ On l'a choisi parce que le cours en parle (deux TIT-FOR-TAT qui se punissent en 
 
 Avec des erreurs, GRUDGER perdra sa première place : une seule erreur suffit à la rendre rancunière pour toute la partie, même contre les stratégies gentilles. C'est TIT-FOR-TWO-TATS qui gagnera, car elle laisse passer une trahison isolée.
 
+**Implémentation**
+
+C'est Skander qui a codé le bruit dans le moteur : un paramètre `noise`, et à chaque tour, chaque coup est inversé avec cette probabilité. Le coup inversé est celui qui est vraiment joué : il compte dans les gains et l'adversaire le voit dans l'historique. Le bruit a son propre générateur aléatoire, donc il ne change ni les coups de RANDOM et JOSS ni la longueur des parties.
+
+**Résultats**
+
+![Classement avec bruit](etape3_bruit.png)
+
+Le classement change complètement par rapport à l'étape 2. JOSS passe de la cinquième à la première place, ALL-D de la sixième à la deuxième, et GRUDGER tombe à la troisième place. TIT-FOR-TWO-TATS finit sixième.
+
+En regardant les scores, j'ai remarqué que les trois premiers sont très proches : 54 points d'écart sur environ 14 400. J'ai donc relancé le tournoi avec dix autres graines (0 à 9) pour savoir si ce classement était solide : JOSS est première 9 fois sur 10, GRUDGER est deuxième 9 fois sur 10, et TIT-FOR-TWO-TATS est sixième les 10 fois. Avec la graine 42, ALL-D passe juste devant GRUDGER, mais c'est l'exception.
+
+**Comparaison avec ma prédiction**
+
+Ma prédiction était à moitié juste.
+
+- **GRUDGER perd bien sa première place**, mais elle ne s'effondre pas : elle reste dans les trois premières.
+- **TIT-FOR-TWO-TATS ne gagne pas du tout**, elle finit avant-dernière. C'est la partie fausse de ma prédiction.
+
+Pour comprendre, j'ai regardé les duels avec bruit :
+
+![Duels avec bruit](etape3_bruit_duels.png)
+
+**Pourquoi GRUDGER recule.** Contre TIT-FOR-TAT et TIT-FOR-TWO-TATS, elle faisait 3000 points sans bruit ; maintenant elle n'en fait plus que 2252 et 2401. C'est exactement ce que j'avais prévu : une seule erreur, et elle trahit jusqu'à la fin de la partie, même contre une stratégie gentille.
+
+**Pourquoi elle reste quand même devant.** Ce que je n'avais pas prévu, c'est que GRUDGER garde ses points contre RANDOM (3350) et reste la meilleure contre ALL-D (2028). Le bruit lui fait perdre ses partenaires, mais elle continue d'exploiter les stratégies qui trahissent.
+
+**Pourquoi TIT-FOR-TWO-TATS ne gagne pas.** C'est là que je me suis trompé. Je pensais que sa patience la protégerait des erreurs. Mais les duels montrent deux problèmes :
+
+1. **Contre GRUDGER, elle tombe de 3000 à 1941 points.** Sa patience ne sert à rien si l'autre ne pardonne pas : quand c'est elle qui fait une erreur, GRUDGER la punit pour toujours. Pardonner ne suffit pas, il faut que les deux pardonnent.
+2. **Contre ALL-D, elle fait 1844 points, son pire score.** De temps en temps, un D d'ALL-D est inversé en C par erreur. Ça casse la série de « deux D de suite » que TIT-FOR-TWO-TATS attend pour riposter, donc elle recommence à coopérer et se fait exploiter encore.
+
+**Pourquoi JOSS monte.** Contre TIT-FOR-TAT, JOSS gagne 302 points de plus qu'à l'étape 2. Sans bruit, une trahison de JOSS lançait un écho de représailles D/C, C/D qui pouvait durer longtemps. Avec le bruit, une nouvelle erreur peut casser cet écho et ramener la coopération, comme le montre le cours. Et comme tout le monde fait des erreurs, les trahisons volontaires de JOSS se remarquent moins.
+
+**Ce que j'en retiens**
+
+Avec le bruit, la coopération est beaucoup plus fragile : les stratégies gentilles perdent les points qu'elles se donnaient entre elles, et l'écart avec les stratégies qui trahissent devient minuscule. J'avais raison sur le fait que ne jamais pardonner coûte cher quand des erreurs sont possibles. Mais je me suis trompé sur la solution : pardonner les trahisons isolées ne suffit pas, il faut aussi que l'adversaire pardonne, et ne pas se laisser exploiter. Le cours propose justement une autre idée, TIT-FOR-TAT généreux, qui pardonne de temps en temps au hasard. Ce serait intéressant de la tester.
+
 ### 6.2. L'horizon inconnu
 
 Au lieu de jouer exactement 200 tours, après chaque tour la partie continue avec une probabilité w. Personne ne sait donc quand elle va s'arrêter.
