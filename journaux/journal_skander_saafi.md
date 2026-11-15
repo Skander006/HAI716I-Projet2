@@ -25,14 +25,15 @@ Mes principaux choix techniques :
 - Une interface commune `jouer(mes_coups, ses_coups, rng)` pour intégrer les stratégies.
 
 J'ai ensuite implémenté le tournoi tous contre tous : chaque paire joue 5 parties de 200 tours. Les scores sont cumulés pour établir le classement.
-Dans cette première version, les paires inversées et les auto-rencontres sont exclues.
-
+Dans cette première version, chaque paire de stratégies distinctes joue une seule série de cinq parties. Les auto-rencontres sont exclues afin de concentrer la comparaison sur les interactions entre stratégies différentes. Ce protocole sera conservé dans les expériences suivantes pour permettre des comparaisons cohérentes.
 ### 2.2. Tests et difficultés
 
 J'ai testé le moteur avec trois stratégies simples : ALL-C, ALL-D et TIT-FOR-TAT.
-Les tests automatiques ont permis de vérifier la matrice des gains, les scores cumulés, le classement et la reproductibilité. Tous les tests ont réussi.
+Les tests automatiques ont permis de vérifier la matrice des gains, les scores cumulés et le classement. Les résultats sont identiques lors de deux exécutions avec la même graine. Tous les tests ont réussi.
 
-*Capture d'écran des tests réussis : ![Résultats des tests du moteur et du tournoi](img.png)*
+**Résultats des tests :**
+
+![Résultats des tests du moteur et du tournoi](img.png)
 
 J'ai également résolu des problèmes d'importation entre modules Python et ajouté l'attribut `nom` aux stratégies de test pour permettre leur classement.
 
