@@ -19,6 +19,7 @@ Ce tableau est complété au fur et à mesure du projet.
 | Population de l'étape 1 | ALL-D, RANDOM, TIT-FOR-TAT, TESTER, JOSS | imposée par l'énoncé |
 | Ma nouvelle stratégie (étape 2) | GRUDGER | voir partie 5 |
 | Stratégie de Skander (étape 2) | TIT-FOR-TWO-TATS | voir partie 5 |
+| Modifications (étape 3) | bruit 5 % ; horizon inconnu, w = 0,995 | voir partie 6 |
 
 ---
 
@@ -98,7 +99,7 @@ Une fois mes stratégies fusionnées avec le moteur de Skander sur la branche `m
 
 ### 4.1. TIT-FOR-TAT ne gagne pas
 
-C'est ALL-D qui gagne, et TIT-FOR-TAT ne finit que troisième. Le résultat de 1980 n'est donc pas reproduit. Pour comprendre pourquoi, j'ai regardé le score de TIT-FOR-TAT contre chaque adversaire (total sur les 5 parties, obtenu avec la fonction `run_duels`, voir partie 6) :
+C'est ALL-D qui gagne, et TIT-FOR-TAT ne finit que troisième. Le résultat de 1980 n'est donc pas reproduit. Pour comprendre pourquoi, j'ai regardé le score de TIT-FOR-TAT contre chaque adversaire (total sur les 5 parties, obtenu avec la fonction `run_duels`, voir partie 7) :
 
 | TIT-FOR-TAT contre | Score de TFT | Ce qui se passe |
 |---|---|---|
@@ -177,7 +178,7 @@ En fait, GRUDGER fait un peu les deux à la fois : avec les stratégies gentille
 
 ### 5.4. Ce qui a changé par rapport à l'étape 1
 
-**ALL-D n'a plus personne à exploiter.** Les deux nouvelles stratégies commencent par coopérer, mais elles se défendent : ALL-D ne fait qu'environ 2000 points contre chacune. Par contre, entre elles, les stratégies gentilles se font 3000 points. C'est justement ce qui manquait à TIT-FOR-TAT à l'étape 1 : maintenant elle a des partenaires, et elle repasse devant ALL-D. Ça rejoint ce que je pensais en partie 4 : TIT-FOR-TAT a besoin d'autres stratégies qui coopèrent pour bien marcher.
+**Les nouvelles stratégies ne donnent rien à ALL-D.** ALL-D exploite toujours RANDOM (3494 points), mais les deux nouvelles stratégies commencent par coopérer et se défendent : ALL-D ne fait qu'environ 2000 points contre chacune. Par contre, entre elles, les stratégies gentilles se font 3000 points. C'est justement ce qui manquait à TIT-FOR-TAT à l'étape 1 : maintenant elle a des partenaires, et elle repasse devant ALL-D. Ça rejoint ce que je pensais en partie 4 : TIT-FOR-TAT a besoin d'autres stratégies qui coopèrent pour bien marcher.
 
 **TESTER profite de TIT-FOR-TWO-TATS.** En regardant les duels, j'ai vu que TESTER fait 3670 points contre elle, son meilleur score. En déroulant la partie, j'ai compris pourquoi : le cycle de TESTER, C, C, D, ne contient jamais deux D de suite. Du coup, TIT-FOR-TWO-TATS ne riposte jamais et se fait avoir pendant toute la partie. Être patient, ça coûte cher contre quelqu'un qui trahit souvent mais jamais deux fois d'affilée.
 
@@ -187,7 +188,39 @@ Avec les auto-rencontres, le haut du classement ne change pas : GRUDGER (18 493)
 
 ---
 
-## 6. Impasses
+## 6. Étape 3 — Modifier le tournoi
+
+Pour l'étape 3, il fallait appliquer au moins deux modifications au tournoi. Avec Skander, on a choisi le **bruit** et l'**horizon inconnu**. Pour le code, on s'est réparti le travail : Skander programme le bruit, moi l'horizon inconnu. Mais chacun fait ses propres prédictions et sa propre analyse pour les deux.
+
+Pour chaque modification, j'ai écrit ma prédiction ici avant de lancer quoi que ce soit.
+
+### 6.1. Le bruit
+
+Avec le bruit, chaque coup peut être inversé par erreur avec une petite probabilité (5 %, l'exemple de l'énoncé) : une stratégie veut jouer C, mais c'est D qui part, ou l'inverse.
+
+On l'a choisi parce que le cours en parle (deux TIT-FOR-TAT qui se punissent en écho après une seule erreur), et surtout parce que c'est le vrai test pour ma stratégie : à l'étape 2, GRUDGER a gagné parce que personne ne trahissait par erreur.
+
+**Ma prédiction (écrite avant de lancer le tournoi) :**
+
+Avec des erreurs, GRUDGER perdra sa première place : une seule erreur suffit à la rendre rancunière pour toute la partie, même contre les stratégies gentilles. C'est TIT-FOR-TWO-TATS qui gagnera, car elle laisse passer une trahison isolée.
+
+### 6.2. L'horizon inconnu
+
+Au lieu de jouer exactement 200 tours, après chaque tour la partie continue avec une probabilité w. Personne ne sait donc quand elle va s'arrêter.
+
+J'ai choisi cette modification parce qu'elle touche directement l'argument du cours en faveur d'ALL-D : la récurrence à rebours ne marche que si on connaît le dernier tour. Le cours dit aussi que l'infini n'est pas nécessaire pour coopérer, il suffit que les joueurs sachent qu'ils ont de bonnes chances de se revoir. Je voulais voir ce que ça change concrètement dans notre tournoi.
+
+Pour pouvoir comparer avec l'étape 2, j'ai choisi **w = 0,995** : une partie dure alors 200 tours en moyenne (1 / (1 − w) = 200), comme avant. La seule différence, c'est que certaines parties seront plus courtes et d'autres plus longues.
+
+**Ma prédiction (écrite avant de lancer le tournoi) :**
+
+Je pense que l'horizon inconnu va aider ALL-D. Les stratégies jouent pareil qu'avant, mais avec w, certaines parties vont être très courtes. Et dans une partie courte, le premier tour compte beaucoup : ALL-D le gagne contre les gentilles (5 points pour elle, 0 pour l'autre), et après il n'y a pas assez de tours pour que TIT-FOR-TAT ou GRUDGER rattrapent en coopérant. Sur 200 tours, perdre le premier tour ce n'est presque rien, mais sur 10 tours ça fait une vraie différence.
+
+Du coup, je m'attends à ce qu'ALL-D remonte beaucoup par rapport à l'étape 2 (elle était sixième) et qu'elle passe devant les stratégies gentilles.
+
+---
+
+## 7. Impasses
 
 - **La règle de TESTER ne suffisait pas.** Au départ, je pensais coder TESTER directement à partir de la phrase du cours. En réalité, elle ne dit pas ce qu'est une riposte ni si le passage en TIT-FOR-TAT est définitif. J'ai dû faire deux choix, expliqués en 3.4. En déroulant les parties à la main, j'ai vu qu'avec ces choix, TESTER contre TIT-FOR-TAT ne revient jamais à la coopération. Une autre interprétation aurait pu donner un comportement très différent.
 - **Des scores de duels faux de quelques points.** Dans une première version de ce journal, le score de TIT-FOR-TAT contre RANDOM était 2494, et la somme de ses duels ne donnait pas son total du classement (4 points d'écart). Skander l'a remarqué en relisant. En cherchant, j'ai compris que j'avais recalculé les duels en mettant TIT-FOR-TAT en premier joueur, alors que dans le tournoi c'est RANDOM qui joue en premier. Or le moteur donne une graine différente à chaque joueur : en inversant l'ordre, RANDOM ne tire plus les mêmes coups. Pour que les chiffres sortent du code du dépôt et plus d'un calcul à côté, j'ai ajouté au moteur une fonction `run_duels`. Elle fait jouer les stratégies exactement comme le tournoi (même ordre, mêmes graines, même option `self_play`), mais elle renvoie le score de chaque duel au lieu du total. J'ai aussi ajouté un test qui vérifie que, pour chaque stratégie, la somme de ses duels est égale à son score dans le classement, avec et sans auto-rencontres. Tous les scores de duels de ce journal viennent maintenant de cette fonction.
