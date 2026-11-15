@@ -31,7 +31,7 @@ Avec Skander, nous nous sommes réparti le travail : lui construit le moteur et 
 
 Pour que nos deux parties s'emboîtent, nous nous sommes d'abord mis d'accord sur une seule chose : la façon dont le moteur appelle une stratégie. Chaque stratégie a un nom et une méthode `jouer(mes_coups, ses_coups, rng)` qui renvoie C ou D. Le `rng`, c'est le hasard fourni par le moteur avec une graine fixe : c'est ce qui permet de relancer le tournoi et d'obtenir exactement le même résultat, comme le demande l'énoncé.
 
-À partir de là, j'ai écrit les stratégies une par une, avec un commit pour chacune.
+À partir de là, j'ai écrit les stratégies une par une, avec un commit pour chacune. Restait à savoir si notre version du tournoi allait donner le même vainqueur qu'en 1980.
 
 ---
 
@@ -89,6 +89,8 @@ Ces trahisons surprises devraient lui rapporter quelques points contre les strat
 
 **Mon avis :** JOSS essaie de gagner un peu plus que TIT-FOR-TAT en trichant de temps en temps. Je pense que c'est un mauvais calcul : chaque trahison de 5 points se paie ensuite par plusieurs tours de représailles. Elle illustre bien la règle d'Axelrod « ne pas être trop malin ».
 
+Mes cinq stratégies étaient écrites et mes avis notés. Il ne restait plus qu'à les faire s'affronter pour de vrai.
+
 ---
 
 ## 4. Étape 1 — Le premier tournoi (15/11)
@@ -99,7 +101,7 @@ Une fois mes stratégies fusionnées avec le moteur de Skander sur la branche `m
 
 ### 4.1. TIT-FOR-TAT ne gagne pas
 
-C'est ALL-D qui gagne, et TIT-FOR-TAT ne finit que troisième. Le résultat de 1980 n'est donc pas reproduit. Pour comprendre pourquoi, j'ai regardé le score de TIT-FOR-TAT contre chaque adversaire (total sur les 5 parties, obtenu avec la fonction `run_duels`, voir partie 7) :
+C'est ALL-D qui gagne, et TIT-FOR-TAT ne finit que troisième. Le résultat de 1980 n'est donc pas reproduit. Pour comprendre pourquoi, j'ai regardé le score de TIT-FOR-TAT contre chaque adversaire (total sur les 5 parties, obtenu avec la fonction `run_duels`) :
 
 | TIT-FOR-TAT contre | Score de TFT | Ce qui se passe |
 |---|---|---|
@@ -116,7 +118,7 @@ ALL-D, de son côté, a une proie : contre RANDOM, elle marque 3494 points, son 
 
 Je vois deux différences avec le tournoi d'Axelrod :
 
-1. **La taille et la nature de la population.** En 1980, il y avait 14 programmes, et la plupart commençaient par coopérer. TIT-FOR-TAT trouvait donc beaucoup de partenaires avec qui gagner 3 points par tour. Ici, avec cinq stratégies dont aucune n'est vraiment gentille à part elle, elle n'en a aucun.
+1. **La taille et la nature de la population.** En 1980, il y avait 14 programmes, et beaucoup commençaient par coopérer. TIT-FOR-TAT trouvait donc beaucoup de partenaires avec qui gagner 3 points par tour. Ici, avec cinq stratégies dont aucune n'est vraiment gentille à part elle, elle n'en a aucun.
 2. **Les matchs contre soi-même.** Axelrod faisait jouer chaque programme contre son jumeau ; notre tournoi de référence ne le fait pas. Pour vérifier si cela suffisait à expliquer l'écart, Skander a ajouté au moteur une option `self_play`, et j'ai relancé le même tournoi avec ces matchs :
 
 ![Classement avec auto-rencontres](etape1_auto_rencontres.png)
@@ -131,6 +133,8 @@ Ce résultat rejoint ce que dit le cours : TIT-FOR-TAT n'est pas « la » strat�
 - RANDOM finit dernière, comme prévu en 3.2.
 - Les deux comportements que j'avais repérés en déroulant les parties à la main se retrouvent dans les scores : l'alternance TESTER/TIT-FOR-TAT (2500 de chaque côté) et l'écho JOSS/TIT-FOR-TAT.
 - Une surprise : TESTER finit deuxième, devant TIT-FOR-TAT. Son D d'ouverture lui coûte contre TIT-FOR-TAT, mais elle exploite RANDOM et JOSS un peu mieux que TIT-FOR-TAT.
+
+Une question restait ouverte : si TIT-FOR-TAT perd parce qu'elle n'a pas de partenaires, que se passe-t-il quand on en ajoute ? C'est exactement ce que l'étape 2 allait permettre de voir.
 
 ---
 
@@ -154,7 +158,7 @@ Sa règle : je coopère, et je ne trahis que si l'adversaire a joué D **deux fo
 
 En mettant nos deux stratégies côte à côte, je me suis rendu compte qu'elles étaient presque opposées : la mienne ne pardonne jamais, la sienne pardonne facilement. Ça tombait bien pour voir lequel des deux comportements s'en sort le mieux.
 
-Sur le papier, je m'attends à ce qu'elle joue bien contre les stratégies gentilles, comme TIT-FOR-TAT, et surtout mieux que TIT-FOR-TAT contre JOSS : quand JOSS trahit par surprise, TIT-FOR-TWO-TATS ne riposte pas, donc il n'y a pas d'écho de représailles et la coopération reprend tout de suite. Par contre, contre ALL-D, elle perd les deux premiers tours au lieu d'un seul, et une stratégie qui trahit souvent mais jamais deux fois de suite pourrait l'exploiter sans jamais être punie.
+D'après sa règle, elle devrait bien jouer contre les stratégies gentilles, comme TIT-FOR-TAT, et surtout mieux que TIT-FOR-TAT contre JOSS : quand JOSS trahit par surprise, TIT-FOR-TWO-TATS ne riposte pas, donc il n'y a pas d'écho de représailles et la coopération reprend tout de suite. Par contre, contre ALL-D, elle perd les deux premiers tours au lieu d'un seul, et une stratégie qui trahit souvent mais jamais deux fois de suite pourrait l'exploiter sans jamais être punie.
 
 **Mon avis :** sa patience est un avantage quand les trahisons sont rares et accidentelles, mais c'est aussi une porte ouverte pour les stratégies qui calculent leurs trahisons.
 
@@ -188,9 +192,9 @@ En fait, GRUDGER fait un peu les deux à la fois : avec les stratégies gentille
 
 **TESTER profite de TIT-FOR-TWO-TATS.** En regardant les duels, j'ai vu que TESTER fait 3670 points contre elle, son meilleur score. En déroulant la partie, j'ai compris pourquoi : le cycle de TESTER, C, C, D, ne contient jamais deux D de suite. Du coup, TIT-FOR-TWO-TATS ne riposte jamais et se fait avoir pendant toute la partie. Être patient, ça coûte cher contre quelqu'un qui trahit souvent mais jamais deux fois d'affilée.
 
-**Mais la patience paie contre JOSS.** Comme je l'attendais en 5.2, TIT-FOR-TWO-TATS fait 2629 points contre JOSS, alors que TIT-FOR-TAT n'en fait que 2046 : quand JOSS trahit par surprise, elle ne riposte pas, et la coopération reprend sans écho de représailles. Sa patience l'aide contre les trahisons rares, et la dessert contre les trahisons régulières.
+**Mais la patience paie contre JOSS.** Comme le laissait penser sa règle (5.2), TIT-FOR-TWO-TATS fait 2629 points contre JOSS, alors que TIT-FOR-TAT n'en fait que 2046 : quand JOSS trahit par surprise, elle ne riposte pas, et la coopération reprend sans écho de représailles. Sa patience l'aide contre les trahisons rares, et la dessert contre les trahisons régulières.
 
-**Le pardon ne gagne pas ici.** J'avais choisi GRUDGER pour tester la règle « pardonner » d'Axelrod, et dans notre tournoi, c'est la stratégie rancunière qui gagne, alors que la plus patiente finit quatrième. Mon explication : comme il n'y a aucune erreur, les stratégies gentilles ne trahissent jamais, donc GRUDGER n'a jamais besoin de pardonner. Je pense que ça changera si un coup peut être inversé par erreur : une seule erreur et GRUDGER trahit jusqu'à la fin.
+**Le pardon ne gagne pas ici.** J'avais choisi GRUDGER pour tester la règle « pardonner » d'Axelrod, et dans notre tournoi, c'est la stratégie rancunière qui gagne, alors que la plus patiente finit quatrième. Mon explication : comme il n'y a aucune erreur, les stratégies gentilles ne trahissent jamais, donc GRUDGER n'a jamais besoin de pardonner. Je pense que ça changera si un coup peut être inversé par erreur : une seule erreur et GRUDGER trahit jusqu'à la fin. C'est ce que l'étape 3 allait vérifier.
 
 Avec les auto-rencontres, le haut du classement ne change pas : GRUDGER (18 493) reste devant TIT-FOR-TAT (18 009).
 
@@ -244,11 +248,13 @@ Pour comprendre, j'ai regardé les duels avec bruit :
 1. **Contre GRUDGER, elle tombe de 3000 à 1941 points.** Sa patience ne sert à rien si l'autre ne pardonne pas : quand c'est elle qui fait une erreur, GRUDGER la punit pour toujours. Pardonner ne suffit pas, il faut que les deux pardonnent.
 2. **Contre ALL-D, elle fait 1844 points, son pire score.** De temps en temps, un D d'ALL-D est inversé en C par erreur. Ça casse la série de « deux D de suite » que TIT-FOR-TWO-TATS attend pour riposter, donc elle recommence à coopérer et se fait exploiter encore.
 
-**Pourquoi JOSS monte.** Contre TIT-FOR-TAT, JOSS gagne 302 points de plus qu'à l'étape 2. Sans bruit, une trahison de JOSS lançait un écho de représailles D/C, C/D qui pouvait durer longtemps. Avec le bruit, une nouvelle erreur peut casser cet écho et ramener la coopération, comme le montre le cours. Et comme tout le monde fait des erreurs, les trahisons volontaires de JOSS se remarquent moins.
+**Pourquoi JOSS monte.** Contre TIT-FOR-TAT, JOSS gagne 302 points de plus qu'à l'étape 2. Je n'ai pas de preuve directe de la raison, seulement une explication possible : sans bruit, une trahison de JOSS lançait un écho de représailles D/C, C/D qui pouvait durer longtemps, et avec le bruit, une nouvelle erreur peut casser cet écho et ramener la coopération, comme le montre le cours. Pour le vérifier vraiment, il faudrait regarder les historiques des parties coup par coup, ce que je n'ai pas fait.
 
 **Ce que j'en retiens**
 
 Avec le bruit, la coopération est beaucoup plus fragile : les stratégies gentilles perdent les points qu'elles se donnaient entre elles, et l'écart avec les stratégies qui trahissent devient minuscule. J'avais raison sur le fait que ne jamais pardonner coûte cher quand des erreurs sont possibles. Mais je me suis trompé sur la solution : pardonner les trahisons isolées ne suffit pas, il faut aussi que l'adversaire pardonne, et ne pas se laisser exploiter. Le cours propose justement une autre idée, TIT-FOR-TAT généreux, qui pardonne de temps en temps au hasard. Ce serait intéressant de la tester.
+
+Le bruit attaquait la coopération par les erreurs. Ma deuxième modification, elle, s'attaque à l'argument principal d'ALL-D : le dernier tour.
 
 ### 6.2. L'horizon inconnu
 
@@ -272,6 +278,8 @@ J'ai fait un choix : ce tirage utilise son propre générateur, qui dépend seul
 
 Pour vérifier, j'ai écrit un test : avec w = 0, une partie dure bien un seul tour ; la longueur est la même quelles que soient les stratégies ; et sur 2000 parties avec w = 0,995, la moyenne est de 204 tours, avec des parties d'un seul tour et d'autres de plus de 1500 tours.
 
+![Test de l'horizon inconnu](etape3_horizon_tests.png)
+
 **Résultats**
 
 ![Classement avec l'horizon inconnu](etape3_horizon.png)
@@ -280,7 +288,7 @@ Le classement est **exactement le même qu'à l'étape 2** : GRUDGER reste premi
 
 **Comparaison avec ma prédiction**
 
-Ma prédiction était fausse : ALL-D n'a pas remonté du tout. En cherchant pourquoi, j'ai regardé la longueur des 5 parties : 618, 137, 291, 401 et 317 tours. Il n'y a eu **aucune partie courte**. Or mon raisonnement reposait justement sur les parties courtes. Sur 137 tours ou plus, le premier tour gagné par ALL-D (5 points contre 0) ne pèse presque rien face aux 3 points par tour que les stratégies gentilles se donnent entre elles.
+Ma prédiction était fausse : ALL-D n'a pas remonté du tout. En cherchant pourquoi, j'ai regardé la longueur des 5 parties : 618, 137, 291, 401 et 317 tours (elles s'affichent dans la capture du test). Grâce au générateur réservé à l'arrêt des parties, ce sont les mêmes 5 longueurs pour toutes les paires de stratégies. Il n'y a eu **aucune partie courte**. Or mon raisonnement reposait justement sur les parties courtes. Sur 137 tours ou plus, le premier tour gagné par ALL-D (5 points contre 0) ne pèse presque rien face aux 3 points par tour que les stratégies gentilles se donnent entre elles.
 
 J'ai relancé avec d'autres graines (0, 100, 1000) : le classement ne bouge pas. Ce n'est donc pas un hasard de la graine 42. Avec w = 0,995, les parties très courtes sont rares, et nos stratégies jouent exactement pareil quelle que soit la longueur, puisqu'aucune ne regarde le numéro du tour.
 
@@ -301,11 +309,68 @@ Mon idée n'était donc pas complètement fausse : quand les parties sont vraime
 
 **Ce que j'en retiens**
 
-Je me suis trompé sur l'ordre de grandeur, pas sur le mécanisme. Ça rejoint le cours : pour que la coopération l'emporte, il n'est pas nécessaire que le jeu soit infini, il suffit que « le futur pèse assez lourd », c'est-à-dire que les joueurs aient de bonnes chances de se revoir. Avec w = 0,995, c'est largement le cas ; avec w = 0,8, ce n'est plus le cas, et trahir tout de suite devient la meilleure option.
+Je me suis trompé sur l'ordre de grandeur, pas sur le mécanisme. Ça rejoint le cours : pour que la coopération l'emporte, il n'est pas nécessaire que le jeu soit infini, il suffit que « le futur pèse assez lourd », c'est-à-dire que les joueurs aient de bonnes chances de se revoir. Avec w = 0,995, c'est largement le cas ; avec w = 0,8, ce n'est plus le cas, et dans notre population de sept stratégies, c'est ALL-D qui obtient le meilleur score. Ça ne veut pas dire que trahir est la meilleure stratégie dans l'absolu : avec d'autres adversaires, le résultat pourrait être différent.
+
+Au bout de ces deux expériences, deux de mes trois prédictions étaient fausses. C'est pourtant en revenant dessus que j'ai le plus appris.
 
 ---
 
 ## 7. Impasses
 
-- **La règle de TESTER ne suffisait pas.** Au départ, je pensais coder TESTER directement à partir de la phrase du cours. En réalité, elle ne dit pas ce qu'est une riposte ni si le passage en TIT-FOR-TAT est définitif. J'ai dû faire deux choix, expliqués en 3.4. En déroulant les parties à la main, j'ai vu qu'avec ces choix, TESTER contre TIT-FOR-TAT ne revient jamais à la coopération. Une autre interprétation aurait pu donner un comportement très différent.
-- **Des scores de duels faux de quelques points.** Dans une première version de ce journal, le score de TIT-FOR-TAT contre RANDOM était 2494, et la somme de ses duels ne donnait pas son total du classement (4 points d'écart). Skander l'a remarqué en relisant. En cherchant, j'ai compris que j'avais recalculé les duels en mettant TIT-FOR-TAT en premier joueur, alors que dans le tournoi c'est RANDOM qui joue en premier. Or le moteur donne une graine différente à chaque joueur : en inversant l'ordre, RANDOM ne tire plus les mêmes coups. Pour que les chiffres sortent du code du dépôt et plus d'un calcul à côté, j'ai ajouté au moteur une fonction `run_duels`. Elle fait jouer les stratégies exactement comme le tournoi (même ordre, mêmes graines, même option `self_play`), mais elle renvoie le score de chaque duel au lieu du total. J'ai aussi ajouté un test qui vérifie que, pour chaque stratégie, la somme de ses duels est égale à son score dans le classement, avec et sans auto-rencontres. Tous les scores de duels de ce journal viennent maintenant de cette fonction.
+Ce sont les moments où mon raisonnement n'a pas marché, et ce que j'ai changé ensuite.
+
+- **TIT-FOR-TAT ne gagne pas à l'étape 1.** En lisant le cours, je pensais retrouver le résultat d'Axelrod. En écrivant TIT-FOR-TAT, j'ai commencé à en douter (3.3), et le tournoi l'a confirmé : c'est ALL-D qui a gagné. En regardant les duels, j'ai compris que le problème venait de la population : TIT-FOR-TAT n'avait aucun partenaire gentil. J'ai arrêté de voir TIT-FOR-TAT comme « la meilleure stratégie » et j'ai commencé à regarder contre qui chaque stratégie joue (partie 4).
+- **La règle de TESTER ne suffisait pas.** Je pensais pouvoir la coder directement à partir de la phrase du cours, mais elle ne dit pas ce qu'est une riposte. J'ai dû faire un choix, et en déroulant les parties à la main, j'ai vu que ce choix changeait complètement son comportement contre TIT-FOR-TAT (partie 3.4).
+- **Ma prédiction sur l'horizon inconnu était fausse.** Je pensais qu'ALL-D allait remonter grâce aux parties courtes, mais le classement n'a pas bougé. Au lieu d'abandonner l'idée, j'ai cherché si elle était fausse ou juste mal dimensionnée : en diminuant w, j'ai vu qu'ALL-D gagne bien, mais seulement avec des parties d'environ 5 tours (partie 6.2).
+- **Ma prédiction sur TIT-FOR-TWO-TATS avec le bruit était fausse.** Je pensais que sa patience la protégerait des erreurs, et elle a fini avant-dernière. Ça m'a fait changer d'avis sur le pardon : pardonner ne sert à rien si l'adversaire ne pardonne pas, ou s'il en profite (partie 6.1).
+
+---
+
+## 8. Bilan
+
+### 8.1. Ce que j'ai appris sur la coopération
+
+En lisant le cours, je pensais au début que TIT-FOR-TAT allait simplement gagner, comme en 1980. Les trois étapes m'ont montré que ce n'est pas aussi simple : le classement dépend surtout de **qui joue contre qui** et **des règles du tournoi**.
+
+| Étape | Gagnant | Ce que ça m'a appris |
+|---|---|---|
+| Étape 1 : 5 stratégies du cours | ALL-D | sans partenaires gentils, la coopération ne rapporte rien ; avec les auto-rencontres, TIT-FOR-TAT repasse devant |
+| Étape 2 : 7 stratégies | GRUDGER | dès qu'il y a assez de stratégies gentilles, la coopération gagne, et ALL-D tombe à la sixième place |
+| Étape 3 : horizon inconnu (w = 0,995) | GRUDGER | le classement ne bouge pas tant que les parties restent longues ; ALL-D ne gagne qu'avec des parties d'environ 5 tours |
+| Étape 3 : bruit 5 % | JOSS | les erreurs cassent la coopération entre gentilles, et les écarts entre stratégies deviennent minuscules |
+
+Pour moi, l'idée la plus importante, c'est que la coopération a besoin de deux choses : **des partenaires qui coopèrent aussi**, et **un futur assez long** pour que trahir ne rapporte pas. Quand une de ces deux conditions manque (peu de stratégies gentilles à l'étape 1, parties très courtes avec un petit w), c'est ALL-D qui s'en sort le mieux.
+
+### 8.2. Ce que j'ai retenu de ma stratégie
+
+J'avais choisi GRUDGER pour tester la règle « pardonner » d'Axelrod. Le résultat est plus nuancé que ce que je pensais :
+- **sans erreurs**, ne jamais pardonner ne coûte presque rien : GRUDGER gagne l'étape 2 et l'horizon inconnu ;
+- **avec des erreurs**, elle perd ses partenaires, mais elle reste dans les trois premières parce qu'elle continue d'exploiter les stratégies qui trahissent.
+
+Et la stratégie de Skander m'a montré l'autre côté : pardonner tout seul ne suffit pas non plus, si l'adversaire ne pardonne pas ou s'il en profite.
+
+### 8.3. Mes prédictions
+
+| Prédiction | Résultat |
+|---|---|
+| Bruit : GRUDGER perd sa première place | juste |
+| Bruit : TIT-FOR-TWO-TATS gagne | faux, elle finit sixième |
+| Horizon inconnu : ALL-D remonte et passe devant les gentilles | faux avec w = 0,995, juste seulement avec des parties d'environ 5 tours |
+
+Je me suis trompé deux fois sur trois. Mais à chaque fois, chercher pourquoi m'a appris plus que les prédictions justes : c'est en regardant les duels que j'ai compris que la patience de TIT-FOR-TWO-TATS se retourne contre elle, et c'est en changeant w que j'ai vu à partir de quand le premier tour compte vraiment.
+
+### 8.4. Limites et améliorations possibles
+
+En relisant tout le travail, je vois plusieurs limites à nos résultats :
+
+- **Une petite population.** Nous n'avons que sept stratégies, alors qu'Axelrod en avait quatorze. Comme on l'a vu à chaque étape, ajouter ou retirer une seule stratégie peut changer le gagnant.
+- **Peu de parties.** Le protocole de référence ne fait que 5 parties par paire. Avec le hasard (RANDOM, JOSS, le bruit, la longueur des parties), certains écarts sont très petits : avec le bruit, les trois premières ne sont séparées que de 54 points. J'ai vérifié avec d'autres graines, mais une seule graine de référence reste une limite.
+- **Des choix d'interprétation.** La règle de TESTER dans le cours n'est pas complète : avec une autre définition de la « riposte », ses résultats, et ceux de ses adversaires, pourraient changer.
+- **Une seule valeur pour chaque modification.** Le bruit n'a été testé qu'à 5 %, et l'horizon inconnu surtout avec w = 0,995. L'expérience complémentaire sur w montre que la valeur choisie change complètement la conclusion ; ce serait sûrement pareil pour le bruit.
+
+Si j'avais plus de temps, j'essaierais :
+- **TIT-FOR-TAT généreux**, présenté dans le cours : une stratégie qui pardonne de temps en temps au hasard, pour voir si elle résiste mieux au bruit que GRUDGER et TIT-FOR-TWO-TATS ;
+- **plusieurs niveaux de bruit** (1 %, 5 %, 10 %) pour voir à partir de quand GRUDGER s'effondre vraiment ;
+- **la sélection sur plusieurs générations**, l'une des modifications proposées par l'énoncé, pour voir quelles stratégies survivent quand la population évolue selon les scores ;
+- **combiner le bruit et l'horizon inconnu**, pour se rapprocher d'une situation réelle où on fait des erreurs et où on ne sait pas quand on se reverra.
+
