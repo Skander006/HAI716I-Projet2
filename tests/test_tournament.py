@@ -43,9 +43,26 @@ def test_games_per_pair():
     assert scores["ALL-D"] == 50
     print("Test du nombre de parties réussi !")
 
+def test_self_play():
+    sans = dict(run_tournament([TitForTat, AlwaysDefect],games_per_pair=1,rounds=10))
+    avec = dict(run_tournament([TitForTat, AlwaysDefect],games_per_pair=1,rounds=10,self_play=True))
+
+    assert sans == {"TIT-FOR-TAT": 18, "ALL-D": 23}
+    assert avec == {"TIT-FOR-TAT": 48, "ALL-D": 43}
+
+    print("\n========== TEST DES AUTO-RENCONTRES ==========")
+    print("\nSANS AUTO-RENCONTRES :")
+    for rang, (nom, score) in enumerate(sorted(sans.items(), key=lambda x: x[1], reverse=True), 1):
+        print(f"{rang}. {nom} : {score} points")
+    print("\nAVEC AUTO-RENCONTRES :")
+    for rang, (nom, score) in enumerate(sorted(avec.items(), key=lambda x: x[1], reverse=True), 1):
+        print(f"{rang}. {nom} : {score} points")
+    print("\nTest des auto-rencontres réussi !")
+
 if __name__ == "__main__":
     test_tournament_scores()
     test_tournament_ranking()
     test_reproducibility()
     test_games_per_pair()
+    test_self_play()
     print("\nTous les tests du tournoi sont réussis !")
