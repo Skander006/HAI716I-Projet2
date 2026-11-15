@@ -150,20 +150,29 @@ Pour mieux comprendre ce résultat, nous avons comparé deux configurations :
 Dans les conditions testées, nous avons observé que **ALL-D terminait première dans la configuration A**, tandis que **TIT-FOR-TAT retrouvait la première place dans la configuration B**.
 
 | Rang | Stratégie | Score total |
-|---|---|---|
-| 1 | TIT-FOR-TAT | 48 |
-| 2 | ALL-D | 43 |
-
+|---|---|---:|
+| 1 | TIT-FOR-TAT | 12 009 |
+| 2 | TESTER | 11 687 |
+| 3 | ALL-D | 11 536 |
+| 4 | RANDOM | 10 810 |
+| 5 | JOSS | 10 723 |
 
 **Capture d'écran de la comparaison :**
 
-![Comparaison avec et sans auto-rencontres](comparaison_auto_rencontres.png)
+![Comparaison avec et sans auto-rencontres](etape1_auto_rencontres.png)
 
-Cette différence peut notamment s'expliquer par les gains obtenus lors des auto-rencontres. Deux stratégies TIT-FOR-TAT coopèrent continuellement et obtiennent chacune 3 points par tour, soit 600 points sur une partie de 200 tours. À l'inverse, deux stratégies ALL-D font systématiquement défection et obtiennent chacune 2 points par tour, soit 400 points.
+L'ajout des auto-rencontres modifie le classement initial : TIT-FOR-TAT passe de la troisième à la première place, tandis qu'ALL-D descend de la première à la troisième.
 
-Sur cinq parties, cela représente respectivement 3 000 points pour TIT-FOR-TAT et 2 000 points pour ALL-D lors de leurs auto-rencontres.
+Cette évolution s'explique notamment par les gains obtenus lors des confrontations d'une stratégie contre elle-même.
 
-Ces gains supplémentaires peuvent modifier sensiblement le classement général.
+TIT-FOR-TAT coopère systématiquement avec une copie d'elle-même, ce qui lui rapporte 3 points par tour, soit 3 000 points sur cinq parties de 200 tours.
+
+À l'inverse, ALL-D joue toujours D contre elle-même et obtient 2 points par tour, soit 2 000 points sur les cinq parties.
+
+Ainsi, les auto-rencontres apportent 1 000 points supplémentaires à TIT-FOR-TAT par rapport à ALL-D, ce qui suffit à inverser leur position dans notre classement.
+
+Cette expérience montre que le protocole du tournoi, et notamment l'inclusion ou non des auto-rencontres, peut influencer fortement les résultats.
+
 
 **d) Comparaison avec les résultats d'Axelrod**
 
@@ -241,75 +250,6 @@ La seule modification sera l'ajout de GRUDGER et TIT-FOR-TWO-TATS aux cinq strat
 Je comparerai ensuite le classement des sept stratégies avec celui du tournoi initial, en examinant particulièrement les performances de GRUDGER, TIT-FOR-TWO-TATS, TIT-FOR-TAT et ALL-D.
 
 Cette comparaison permettra de déterminer si les observations confirment mes hypothèses et d'identifier les comportements favorisant ou limitant la coopération.
-
-#### 2.2.2. Implémentation
-
-Pour cette deuxième étape, nous avons ajouté deux nouvelles stratégies au tournoi initial : GRUDGER et TIT-FOR-TWO-TATS. Le tournoi passe ainsi de cinq à sept stratégies.
-
-Notre choix permet de comparer deux comportements opposés face aux défections : une stratégie qui sanctionne définitivement la première trahison et une autre qui tolère les défections isolées.
-
-**a) GRUDGER — Une stratégie sans pardon**
-
-GRUDGER, implémentée par mon binôme, commence par coopérer et continue tant que son adversaire n'a jamais fait défection.
-
-Dès qu'une défection adverse est observée, elle joue définitivement D, même si l'adversaire recommence à coopérer.
-
-Son fonctionnement repose sur une vérification de l'historique adverse : si celui-ci contient au moins un D, la stratégie fait défection.
-
-Cette implémentation ne nécessite aucune variable d'état supplémentaire, puisque l'historique conserve toutes les décisions précédentes.
-
-**b) TIT-FOR-TWO-TATS — Une stratégie tolérante**
-
-De mon côté, j'ai choisi d'implémenter TIT-FOR-TWO-TATS, une variante de TIT-FOR-TAT qui introduit davantage de tolérance.
-
-Contrairement à TIT-FOR-TAT, qui reproduit immédiatement le dernier coup adverse, TIT-FOR-TWO-TATS ne fait défection que si l'adversaire a joué D lors des deux derniers tours consécutifs.
-
-Son comportement repose sur trois règles :
-
-1. Si l'adversaire a joué moins de deux coups, coopérer.
-2. Si ses deux derniers coups sont D, faire défection.
-3. Dans tous les autres cas, coopérer.
-
-Cette stratégie ne conserve pas non plus d'état interne : elle utilise directement les deux derniers éléments de l'historique adverse.
-
-L'objectif de cette implémentation est d'étudier si une tolérance supplémentaire peut préserver la coopération face aux défections occasionnelles, tout en observant les risques d'exploitation associés.
-
-**c) Intégration des nouvelles stratégies**
-
-Les deux stratégies respectent l'interface commune `jouer(mes_coups, ses_coups, rng)` utilisée par le moteur.
-
-Leur intégration ne nécessite donc aucune modification du mécanisme de décision simultanée ni de la matrice des gains.
-
-Le tournoi étendu comprend désormais :
-
-- ALL-D ;
-- RANDOM ;
-- TIT-FOR-TAT ;
-- TESTER ;
-- JOSS ;
-- GRUDGER ;
-- TIT-FOR-TWO-TATS.
-
-Nous avons conservé le protocole expérimental initial : cinq parties de 200 tours pour chaque paire de stratégies distinctes, avec une graine initiale fixée à 42 et sans auto-rencontres.
-
-Cette continuité permet d'étudier l'effet de l'ajout des deux stratégies sans introduire simultanément d'autres modifications expérimentales.
-
-**d) Outil d'analyse des confrontations individuelles**
-
-Pour approfondir l'analyse, mon binôme a également ajouté une fonction `run_duels()`.
-
-Contrairement à `run_tournament()`, qui calcule les scores cumulés et établit le classement général, cette fonction conserve les scores de chaque confrontation individuelle.
-
-Elle retourne un dictionnaire dont les clés correspondent aux couples de noms de stratégies et dont les valeurs représentent les points obtenus par la première stratégie face à la seconde.
-
-Les deux scores d'une confrontation entre stratégies distinctes sont enregistrés séparément, sans rejouer la partie dans l'ordre inverse.
-
-Cette fonction nous permet d'identifier les adversaires favorables ou défavorables à chaque stratégie et d'expliquer les variations de classement à partir des résultats des duels.
-
-Elle constitue donc un outil complémentaire pour l'analyse expérimentale de cette deuxième étape.
-
-#### 2.2.3. Tests et difficultés
-
 
 #### 2.2.2. Implémentation
 
