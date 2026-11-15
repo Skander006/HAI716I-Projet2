@@ -15,7 +15,7 @@ Ce tableau est complété au fur et à mesure du projet.
 | Tours par partie | 200 | format d'Axelrod |
 | Parties par paire | 5 | format d'Axelrod |
 | Graine | fixée dans le moteur (42) | résultats rejouables à l'identique |
-| Match contre soi-même | non (choix du moteur) | Axelrod l'incluait : effet discuté en partie 4 |
+| Match contre soi-même | non par défaut, option `self_play` dans le moteur | Axelrod l'incluait : effet mesuré en partie 4 |
 | Population de l'étape 1 | ALL-D, RANDOM, TIT-FOR-TAT, TESTER, JOSS | imposée par l'énoncé |
 | Ma nouvelle stratégie (étape 2) | GRUDGER | voir partie 5 |
 
@@ -115,7 +115,11 @@ ALL-D, de son côté, a une proie : contre RANDOM, elle marque 3494 points, son 
 Je vois deux différences avec le tournoi d'Axelrod :
 
 1. **La taille et la nature de la population.** En 1980, il y avait 14 programmes, et la plupart commençaient par coopérer. TIT-FOR-TAT trouvait donc beaucoup de partenaires avec qui gagner 3 points par tour. Ici, avec cinq stratégies dont aucune n'est vraiment gentille à part elle, elle n'en a aucun.
-2. **Les matchs contre soi-même.** Axelrod faisait jouer chaque programme contre son jumeau ; notre moteur ne le fait pas. J'ai mesuré ces matchs avec le même moteur : TIT-FOR-TAT contre elle-même marque 3000 points, ALL-D contre elle-même seulement 2000. En les ajoutant, TIT-FOR-TAT repasse en tête (environ 12 000 points contre 11 700 pour TESTER et 11 500 pour ALL-D).
+2. **Les matchs contre soi-même.** Axelrod faisait jouer chaque programme contre son jumeau ; notre tournoi de référence ne le fait pas. Pour vérifier si cela suffisait à expliquer l'écart, Skander a ajouté au moteur une option `self_play`, et j'ai relancé le même tournoi avec ces matchs :
+
+![Classement avec auto-rencontres](etape1_auto_rencontres.png)
+
+TIT-FOR-TAT repasse en tête avec 12 009 points, devant TESTER (11 687) et ALL-D (11 536). L'explication tient en deux chiffres : contre elle-même, TIT-FOR-TAT coopère pendant toute la partie et marque 3000 points sur les 5 parties ; ALL-D contre elle-même ne marque que 2000 points. Ces 1000 points d'écart suffisent à inverser le classement.
 
 Ce résultat rejoint ce que dit le cours : TIT-FOR-TAT n'est pas « la » stratégie optimale, elle prospère seulement s'il y a assez de stratégies qui pensent comme elle.
 
